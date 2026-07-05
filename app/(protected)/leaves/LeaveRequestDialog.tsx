@@ -10,7 +10,7 @@ import { toast } from "sonner"
 import { createClient } from "@/lib/supabase"
 import { Loader2 } from "lucide-react"
 
-export function LeaveRequestDialog({ employeeId, leaveTypes }: { employeeId: string, leaveTypes: any[] }) {
+export function LeaveRequestDialog({ employeeId, leaveTypes }: { employeeId: string, leaveTypes: { id: string, name: string }[] }) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()

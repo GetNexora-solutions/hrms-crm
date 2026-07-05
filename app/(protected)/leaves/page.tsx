@@ -22,7 +22,7 @@ export default async function LeavesPage() {
     .order('created_at', { ascending: false })
 
   // If Admin/Manager, fetch pending leaves of others
-  let pendingApprovals: any[] = []
+  let pendingApprovals: { id: string; status: string; from_date: string; to_date: string; days: number; reason: string; created_at: string; employees: { full_name: string; emp_id: string } | null; leave_types: { name: string } | null }[] = []
   if (['super_admin', 'hr', 'md', 'admin', 'manager'].includes(employee.role)) {
     const { data: pending } = await supabase
       .from('leave_requests')

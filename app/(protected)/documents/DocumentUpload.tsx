@@ -50,8 +50,8 @@ export function DocumentUpload({ employeeId }: { employeeId: string }) {
       setFile(null)
       setName('')
       router.refresh()
-    } catch (error: any) {
-      toast.error(error.message || "Failed to upload document")
+    } catch (error: unknown) {
+      toast.error((error as Error).message || "Failed to upload document")
     } finally {
       setLoading(false)
     }

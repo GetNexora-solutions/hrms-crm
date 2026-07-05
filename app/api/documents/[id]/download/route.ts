@@ -34,7 +34,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     }
 
     return NextResponse.redirect(data.signedUrl)
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error: unknown) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 })
   }
 }

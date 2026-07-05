@@ -8,7 +8,7 @@ export async function askHRAgent(
     role: string;
     name: string;
     module: string;
-    data?: any;
+    data?: unknown;
   }
 ) {
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });

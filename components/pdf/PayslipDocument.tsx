@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
   netPayText: { fontSize: 14, fontWeight: 'bold' }
 })
 
-export const PayslipDocument = ({ payroll }: { payroll: any }) => (
+export const PayslipDocument = ({ payroll }: { payroll: { employees?: { full_name?: string, designation?: string, department?: string, bank_account?: string, bank_ifsc?: string, companies?: { name?: string }, emp_id?: string }, month?: string, basic_salary?: number, hra?: number, da?: number, travel_allowance?: number, other_allowance?: number, gross_salary?: number, pf_deduction?: number, esi_deduction?: number, professional_tax?: number, tds_deduction?: number, total_deductions?: number, net_salary?: number } }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.header}>

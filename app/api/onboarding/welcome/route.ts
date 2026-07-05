@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
   try {
-    const { employee, hrId } = await req.json()
+    const { employee } = await req.json()
     const supabaseAdmin = createAdminClient()
 
     // Generate random temporary password
@@ -59,8 +59,8 @@ export async function POST(req: Request) {
       whatsapp: mockWhatsAppStatus
     })
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Onboarding Error:', error)
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+    return NextResponse.json({ success: false, error: (error as Error).message }, { status: 500 })
   }
 }

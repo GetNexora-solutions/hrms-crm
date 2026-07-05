@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CheckCircle, XCircle } from 'lucide-react'
+import Image from 'next/image'
 
 export default async function VerifyPage({ params }: { params: { emp_id: string } }) {
   const supabase = createClient()
@@ -47,7 +48,9 @@ export default async function VerifyPage({ params }: { params: { emp_id: string 
           <div className="flex justify-center mb-6">
             <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-800 border-4 border-slate-700">
               {employee.avatar_url ? (
-                <img src={employee.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                <div className="relative w-full h-full">
+                  <Image src={employee.avatar_url} alt="Avatar" fill className="object-cover" />
+                </div>
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-4xl text-slate-500 font-bold">
                   {employee.full_name.charAt(0)}

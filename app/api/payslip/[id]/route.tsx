@@ -32,14 +32,14 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
     const stream = await renderToStream(<PayslipDocument payroll={payroll} />)
     
-    return new Response(stream as any, {
+    return new Response(stream as unknown as ReadableStream, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="Payslip_${payroll.month}_${payroll.employees.emp_id}.pdf"`
       }
     })
 
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error: unknown) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 })
   }
 }

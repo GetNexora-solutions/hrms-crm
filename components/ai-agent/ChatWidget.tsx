@@ -46,7 +46,7 @@ export function ChatWidget({ employeeName, role }: ChatWidgetProps) {
       const data = await response.json()
       
       setChatHistory(prev => [...prev, { role: 'agent', text: data.reply || "I couldn't process that." }])
-    } catch (error) {
+    } catch {
       setChatHistory(prev => [...prev, { role: 'agent', text: "Error connecting to AI assistant." }])
     } finally {
       setLoading(false)
@@ -69,7 +69,7 @@ export function ChatWidget({ employeeName, role }: ChatWidgetProps) {
             <div className="space-y-4 pr-1">
               <div className="flex gap-2">
                 <div className="bg-slate-800 text-slate-200 text-sm p-3 rounded-lg rounded-tl-none">
-                  Hi {employeeName}! I'm your AI HR assistant. How can I help you today?
+                  Hi {employeeName}! I&apos;m your AI HR assistant. How can I help you today?
                 </div>
               </div>
               {chatHistory.map((msg, i) => (

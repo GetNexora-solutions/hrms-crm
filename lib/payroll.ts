@@ -1,5 +1,5 @@
-export function calculatePayroll(employee: any, presentDays: number, workingDays: number) {
-  const salary = parseFloat(employee.salary || '0')
+export function calculatePayroll(employee: { salary?: string | number }, presentDays: number, workingDays: number) {
+  const salary = parseFloat(String(employee.salary || '0'))
   const perDay = salary / workingDays
   const earnedSalary = perDay * presentDays
 

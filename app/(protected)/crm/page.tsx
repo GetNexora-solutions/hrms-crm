@@ -18,7 +18,7 @@ export default async function CRMPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white">CRM - Clients & Leads</h1>
-          <p className="text-slate-400">Manage your company's clients and leads.</p>
+          <p className="text-slate-400">Manage your company&apos;s clients and leads.</p>
         </div>
         <Button className="bg-blue-600 hover:bg-blue-700 text-white">Add Client</Button>
       </div>

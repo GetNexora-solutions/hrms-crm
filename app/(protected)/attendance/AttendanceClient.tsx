@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation'
 
 interface AttendanceClientProps {
   employeeId: string
-  initialData: any
+  initialData: { check_in: string | null, check_out: string | null } | null
 }
 
 export function AttendanceClient({ employeeId, initialData }: AttendanceClientProps) {
@@ -63,13 +63,13 @@ export function AttendanceClient({ employeeId, initialData }: AttendanceClientPr
           }
           setCheckingIn(false)
         },
-        (error) => {
+        () => {
           toast.error("Location access denied. Cannot check in.")
           setCheckingIn(false)
         },
         { enableHighAccuracy: true }
       )
-    } catch (error) {
+    } catch {
       toast.error("An unexpected error occurred.")
       setCheckingIn(false)
     }
@@ -102,12 +102,12 @@ export function AttendanceClient({ employeeId, initialData }: AttendanceClientPr
           }
           setLoading(false)
         },
-        (error) => {
+        () => {
           toast.error("Location access denied.")
           setLoading(false)
         }
       )
-    } catch (error) {
+    } catch {
       toast.error("An unexpected error occurred.")
       setLoading(false)
     }

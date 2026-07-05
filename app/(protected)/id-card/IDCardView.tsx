@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Printer } from 'lucide-react'
 import Image from 'next/image'
 
-export function IDCardView({ employee }: { employee: any }) {
+export function IDCardView({ employee }: { employee: { emp_id: string, full_name: string, designation?: string, department?: string, blood_group?: string, emergency_contact?: string, avatar_url?: string | null, companies?: { name: string } | null } }) {
   const verifyUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/verify/${employee.emp_id}`
 
   const handlePrint = () => {
@@ -22,7 +22,7 @@ export function IDCardView({ employee }: { employee: any }) {
             <h2 className="text-xl font-bold tracking-wider uppercase">{employee.companies?.name || 'Company Name'}</h2>
             <div className="absolute -bottom-16 w-32 h-32 bg-white rounded-full border-4 border-white overflow-hidden shadow-lg flex items-center justify-center">
               {employee.avatar_url ? (
-                <img src={employee.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                <Image src={employee.avatar_url} alt="Avatar" fill className="object-cover" />
               ) : (
                 <div className="w-full h-full bg-slate-200 flex items-center justify-center text-slate-400 text-4xl font-bold">
                   {employee.full_name.charAt(0)}

@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Search, Mail, Phone, Building2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import Image from 'next/image'
 
 export default async function DirectoryPage({ searchParams }: { searchParams: { q?: string } }) {
   const supabase = createClient()
@@ -46,7 +47,7 @@ export default async function DirectoryPage({ searchParams }: { searchParams: { 
               <div className="flex justify-between items-start">
                 <div className="absolute -top-12 h-24 w-24 rounded-full border-4 border-slate-900 bg-slate-800 overflow-hidden">
                   {emp.avatar_url ? (
-                    <img src={emp.avatar_url} alt={emp.full_name} className="w-full h-full object-cover" />
+                    <Image src={emp.avatar_url} alt={emp.full_name} fill className="object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-slate-500">
                       {emp.full_name.charAt(0)}

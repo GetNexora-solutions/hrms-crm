@@ -33,7 +33,7 @@ export function GeneratePayrollButton() {
       } else {
         toast.error(data.error || "Failed to generate payroll")
       }
-    } catch (err) {
+    } catch {
       toast.error("An error occurred")
     } finally {
       setLoading(false)

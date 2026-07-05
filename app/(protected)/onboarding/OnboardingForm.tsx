@@ -50,7 +50,7 @@ export function OnboardingForm({ companyId, hrId }: { companyId: string | null, 
       } else {
         toast.error(data.error || "Failed to onboard employee")
       }
-    } catch (err) {
+    } catch {
       toast.error("An error occurred during onboarding.")
     } finally {
       setLoading(false)

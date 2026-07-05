@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     ]).then()
 
     return NextResponse.json({ reply })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('AI Agent Error:', error)
     return NextResponse.json({ error: 'Failed to process request' }, { status: 500 })
   }

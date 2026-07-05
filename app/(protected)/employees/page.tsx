@@ -23,7 +23,7 @@ export default async function EmployeesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white">Employees</h1>
-          <p className="text-slate-400">Manage your company's workforce.</p>
+          <p className="text-slate-400">Manage your company&apos;s workforce.</p>
         </div>
         <Link href="/employees/new">
           <Button className="bg-blue-600 hover:bg-blue-700 text-white">

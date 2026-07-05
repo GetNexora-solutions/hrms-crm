@@ -7,6 +7,8 @@ import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 
+import Image from 'next/image'
+
 interface ShellProps {
   children: React.ReactNode
   role: Role
@@ -35,7 +37,9 @@ export function Shell({ children, role, employeeName, avatarUrl }: ShellProps) {
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" onClick={() => router.push('/profile')} className="rounded-full overflow-hidden">
                {avatarUrl ? (
-                 <img src={avatarUrl} alt="Avatar" className="h-8 w-8 object-cover" />
+                 <div className="relative h-8 w-8">
+                   <Image src={avatarUrl} alt="Avatar" fill className="object-cover" />
+                 </div>
                ) : (
                  <User className="h-5 w-5" />
                )}
