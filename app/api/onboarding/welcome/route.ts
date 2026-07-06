@@ -1,6 +1,16 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { EmployeeIdConfig, resolvePatternPrefixes, generateEmployeeId } from '@/lib/services/employee-id'
+import { getNextEmployeeSerial } from '@/lib/services/employee-serial'
+
+// Temporary config for Phase B
+const TEMP_ID_CONFIG: EmployeeIdConfig = {
+  pattern: 'EMP{SERIAL}',
+  serialLength: 4,
+  startingNumber: 1,
+  resetPolicy: 'never'
+}
 
 export async function POST(req: Request) {
   try {
@@ -13,7 +23,7 @@ export async function POST(req: Request) {
 
     const { data: currentEmployee, error: verifyError } = await supabase
       .from('employees')
-      .select('role')
+      .select('role, company_id')
       .eq('user_id', user.id)
       .single()
 
@@ -28,10 +38,34 @@ export async function POST(req: Request) {
     const { employee } = await req.json()
     const supabaseAdmin = createAdminClient()
 
+    // 1. Generate Employee ID
+    const joiningDate = employee.date_of_joining ? new Date(employee.date_of_joining) : new Date()
+    const variables = {
+      YYYY: joiningDate.getFullYear().toString(),
+      YY: joiningDate.getFullYear().toString().slice(-2),
+      MM: (joiningDate.getMonth() + 1).toString().padStart(2, '0'),
+      DD: joiningDate.getDate().toString().padStart(2, '0'),
+      DEPT: employee.department ? employee.department.substring(0, 3).toUpperCase() : 'GEN'
+    }
+
+    const resolvedPattern = resolvePatternPrefixes(TEMP_ID_CONFIG, variables)
+    const parts = resolvedPattern.split('{SERIAL}')
+    const prefixPart = parts[0]
+    const suffixPart = parts[1] || ''
+
+    const nextSerial = await getNextEmployeeSerial(supabaseAdmin, TEMP_ID_CONFIG, {
+      companyId: currentEmployee.company_id,
+      joiningDate,
+      prefixPart,
+      suffixPart
+    })
+
+    const newEmpId = generateEmployeeId(resolvedPattern, nextSerial, TEMP_ID_CONFIG.serialLength)
+
     // Generate random temporary password
     const tempPassword = Math.random().toString(36).slice(-8) + 'A1!'
 
-    // 1. Create Auth User
+    // 2. Create Auth User
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email: employee.email,
       password: tempPassword,
@@ -44,12 +78,12 @@ export async function POST(req: Request) {
 
     const userId = authData.user.id
 
-    // 2. Create Employee Record
+    // 3. Create Employee Record
     const { data: empData, error: empError } = await supabaseAdmin.from('employees').insert({
       id: userId,
       user_id: userId,
-      company_id: employee.company_id,
-      emp_id: employee.emp_id,
+      company_id: currentEmployee.company_id,
+      emp_id: newEmpId,
       full_name: employee.full_name,
       email: employee.email,
       phone: employee.phone,
@@ -69,14 +103,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: empError.message }, { status: 400 })
     }
 
-    // 3. (Mock) Send Welcome Email & WhatsApp
-    // In production, integrate Resend and Twilio here.
+    // 4. (Mock) Send Welcome Email & WhatsApp
     const mockEmailStatus = `Sent to ${employee.email}`
     const mockWhatsAppStatus = `Sent to ${employee.phone}`
 
     return NextResponse.json({ 
       success: true, 
       employee: empData,
+      tempPassword,
       email: mockEmailStatus,
       whatsapp: mockWhatsAppStatus
     })
