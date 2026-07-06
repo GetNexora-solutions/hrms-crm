@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Plus, Edit, Eye } from 'lucide-react'
 import Link from 'next/link'
+import { getCurrentEmployee } from '@/lib/rbac'
+import { DeactivateButton } from './DeactivateButton'
 
 export default async function EmployeesPage() {
   const supabase = createClient()
@@ -13,6 +15,8 @@ export default async function EmployeesPage() {
     .from('employees')
     .select('*')
     .order('created_at', { ascending: false })
+
+  const currentEmployee = await getCurrentEmployee()
 
   if (error) {
     return <div>Error loading employees: {error.message}</div>
@@ -81,6 +85,13 @@ export default async function EmployeesPage() {
                           <Edit className="h-4 w-4" />
                         </Button>
                       </Link>
+                      {currentEmployee && currentEmployee.id !== emp.id && emp.role !== 'super_admin' && emp.status === 'active' && (
+                        <DeactivateButton 
+                          employeeId={emp.id} 
+                          employeeName={emp.full_name} 
+                          iconOnly={true} 
+                        />
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

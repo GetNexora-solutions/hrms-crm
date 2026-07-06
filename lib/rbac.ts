@@ -20,6 +20,10 @@ export async function getCurrentEmployee() {
     return null
   }
 
+  if (employee.status === 'inactive') {
+    return null
+  }
+
   return employee
 }
 

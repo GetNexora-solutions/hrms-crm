@@ -31,15 +31,22 @@ export default function LoginPage() {
       return
     }
 
-    // Checking if employee exists
+    // Checking if employee exists and status
     const { data: employee, error: empError } = await supabase
       .from('employees')
-      .select('is_temp_password')
+      .select('is_temp_password, status')
       .eq('user_id', data.user.id)
       .single()
 
     if (empError) {
       toast.error("Employee profile not found")
+      setLoading(false)
+      return
+    }
+
+    if (employee?.status === 'inactive') {
+      await supabase.auth.signOut()
+      toast.error("Your account has been deactivated. Please contact HR.")
       setLoading(false)
       return
     }

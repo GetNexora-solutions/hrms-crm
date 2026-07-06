@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft, Briefcase, Mail, Phone, Building, Hash, Calendar, DollarSign, Landmark } from 'lucide-react'
 import Link from 'next/link'
+import { DeactivateButton } from '../DeactivateButton'
 
 export default async function EmployeeProfilePage({ params }: { params: { id: string } }) {
   const supabase = createClient()
@@ -67,13 +68,21 @@ export default async function EmployeeProfilePage({ params }: { params: { id: st
                 <Hash className="h-4 w-4" /> {targetEmployee.emp_id}
               </p>
             </div>
-            {canViewFinancials && (
-              <Link href={`/employees/${targetEmployee.id}/edit`}>
-                <Button variant="outline" className="bg-slate-900 border-slate-700 text-slate-300 hover:text-white">
-                  Edit Profile
-                </Button>
-              </Link>
-            )}
+            <div className="flex items-center gap-2">
+              {targetEmployee.status === 'active' && !isSelf && targetEmployee.role !== 'super_admin' && (isSuperAdmin || isHR || currentEmployee.role === 'admin' || currentEmployee.role === 'md') && (
+                <DeactivateButton 
+                  employeeId={targetEmployee.id} 
+                  employeeName={targetEmployee.full_name} 
+                />
+              )}
+              {canViewFinancials && (
+                <Link href={`/employees/${targetEmployee.id}/edit`}>
+                  <Button variant="outline" className="bg-slate-900 border-slate-700 text-slate-300 hover:text-white">
+                    Edit Profile
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>
