@@ -61,31 +61,31 @@ export function OnboardingForm({ companyId, hrId }: { companyId: string | null, 
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>Employee ID (e.g. EMP001)</Label>
-          <Input name="emp_id" value={formData.emp_id} onChange={handleChange} required className="bg-slate-800 border-slate-700 text-white" />
+          <Label className="text-slate-300">Employee ID (Auto-generated)</Label>
+          <Input name="emp_id" value={formData.emp_id} readOnly placeholder="Auto-generated" className="bg-slate-800 border-slate-700 text-slate-500 cursor-not-allowed" />
         </div>
         <div className="space-y-2">
-          <Label>Full Name</Label>
+          <Label className="text-slate-300">Full Name</Label>
           <Input name="full_name" value={formData.full_name} onChange={handleChange} required className="bg-slate-800 border-slate-700 text-white" />
         </div>
         <div className="space-y-2">
-          <Label>Email</Label>
+          <Label className="text-slate-300">Email</Label>
           <Input type="email" name="email" value={formData.email} onChange={handleChange} required className="bg-slate-800 border-slate-700 text-white" />
         </div>
         <div className="space-y-2">
-          <Label>Phone (with country code, e.g. +91)</Label>
+          <Label className="text-slate-300">Phone (with country code, e.g. +91)</Label>
           <Input name="phone" value={formData.phone} onChange={handleChange} required className="bg-slate-800 border-slate-700 text-white" />
         </div>
         <div className="space-y-2">
-          <Label>Department</Label>
+          <Label className="text-slate-300">Department</Label>
           <Input name="department" value={formData.department} onChange={handleChange} required className="bg-slate-800 border-slate-700 text-white" />
         </div>
         <div className="space-y-2">
-          <Label>Designation</Label>
+          <Label className="text-slate-300">Designation</Label>
           <Input name="designation" value={formData.designation} onChange={handleChange} required className="bg-slate-800 border-slate-700 text-white" />
         </div>
         <div className="space-y-2">
-          <Label>System Role</Label>
+          <Label className="text-slate-300">System Role</Label>
           <Select value={formData.role} onValueChange={(val) => setFormData({...formData, role: val})}>
             <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
               <SelectValue placeholder="Select role" />
@@ -100,7 +100,7 @@ export function OnboardingForm({ companyId, hrId }: { companyId: string | null, 
           </Select>
         </div>
         <div className="space-y-2">
-          <Label>Salary (Annual / Monthly)</Label>
+          <Label className="text-slate-300">Salary (Annual / Monthly)</Label>
           <Input type="number" name="salary" value={formData.salary} onChange={handleChange} required className="bg-slate-800 border-slate-700 text-white" />
         </div>
       </div>
@@ -109,15 +109,15 @@ export function OnboardingForm({ companyId, hrId }: { companyId: string | null, 
         <h3 className="text-lg font-medium text-white mb-4">Bank Details</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label>Bank Name</Label>
+            <Label className="text-slate-300">Bank Name</Label>
             <Input name="bank_name" value={formData.bank_name} onChange={handleChange} required className="bg-slate-800 border-slate-700 text-white" />
           </div>
           <div className="space-y-2">
-            <Label>Account Number</Label>
+            <Label className="text-slate-300">Account Number</Label>
             <Input name="bank_account" value={formData.bank_account} onChange={handleChange} required className="bg-slate-800 border-slate-700 text-white" />
           </div>
           <div className="space-y-2">
-            <Label>IFSC Code</Label>
+            <Label className="text-slate-300">IFSC Code</Label>
             <Input name="bank_ifsc" value={formData.bank_ifsc} onChange={handleChange} required className="bg-slate-800 border-slate-700 text-white" />
           </div>
         </div>

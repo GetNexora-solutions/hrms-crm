@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Plus, Edit } from 'lucide-react'
+import { Plus, Edit, Eye } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function EmployeesPage() {
@@ -70,11 +70,18 @@ export default async function EmployeesPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Link href={`/employees/${emp.id}/edit`}>
-                      <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </Link>
+                    <div className="flex items-center justify-end gap-2">
+                      <Link href={`/employees/${emp.id}`}>
+                        <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                      <Link href={`/employees/${emp.id}/edit`}>
+                        <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </Link>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
