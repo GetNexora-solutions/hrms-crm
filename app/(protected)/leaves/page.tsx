@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { LeaveRequestDialog } from './LeaveRequestDialog'
+import { LeaveActions } from './LeaveActions'
 
 export default async function LeavesPage() {
   const employee = await getCurrentEmployee()
@@ -120,7 +121,7 @@ export default async function LeavesPage() {
                     </TableCell>
                     <TableCell className="text-slate-300">{leave.days}</TableCell>
                     <TableCell>
-                      <Badge variant="secondary" className="bg-slate-800">Pending Review</Badge>
+                      <LeaveActions leaveId={leave.id} />
                     </TableCell>
                   </TableRow>
                 ))}
