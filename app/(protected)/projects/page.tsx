@@ -52,11 +52,11 @@ export default async function ProjectsPage() {
                 </div>
                 <div className="flex justify-between text-sm text-slate-300">
                   <span className="text-slate-500 flex items-center gap-1"><Clock className="h-3 w-3" /> Start</span>
-                  <span>{new Date(project.start_date).toLocaleDateString()}</span>
+                  <span>{project.start_date ? new Date(project.start_date).toLocaleDateString() : 'N/A'}</span>
                 </div>
                 <div className="flex justify-between text-sm text-slate-300">
                   <span className="text-slate-500 flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> End</span>
-                  <span>{new Date(project.end_date).toLocaleDateString()}</span>
+                  <span>{project.end_date ? new Date(project.end_date).toLocaleDateString() : 'N/A'}</span>
                 </div>
               </div>
               

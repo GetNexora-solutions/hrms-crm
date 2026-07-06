@@ -17,7 +17,7 @@ export default async function DashboardPage() {
     .select('*')
     .eq('employee_id', employee.id)
     .eq('date', today)
-    .single()
+    .maybeSingle()
 
   const { count: pendingLeaves } = await supabase
     .from('leave_requests')

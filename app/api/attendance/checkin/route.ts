@@ -51,7 +51,7 @@ export async function POST(req: Request) {
         })
         .eq('employee_id', employeeId)
         .eq('date', today)
-        .select().single()
+        .select().maybeSingle()
 
       if (error) throw error
       

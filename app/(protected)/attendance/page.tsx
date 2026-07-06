@@ -19,7 +19,7 @@ export default async function AttendancePage() {
     .select('*')
     .eq('employee_id', employee.id)
     .eq('date', today)
-    .single()
+    .maybeSingle()
 
   // Get recent attendance history
   const { data: history } = await supabase

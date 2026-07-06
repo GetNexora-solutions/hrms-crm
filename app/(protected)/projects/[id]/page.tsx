@@ -65,7 +65,7 @@ export default async function ProjectTasksPage({ params }: { params: { id: strin
                     <span className="text-slate-500">Assignee: <span className="text-slate-300">{task.employees?.full_name || 'Unassigned'}</span></span>
                     {task.due_date && (
                       <span className="flex items-center gap-1 text-slate-500">
-                        <Clock className="h-3 w-3" /> Due: {new Date(task.due_date).toLocaleDateString()}
+                        <Clock className="h-3 w-3" /> Due: {task.due_date ? new Date(task.due_date).toLocaleDateString() : 'N/A'}
                       </span>
                     )}
                   </div>
