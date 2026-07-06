@@ -11,7 +11,7 @@ export default async function ProjectTasksPage({ params }: { params: { id: strin
   
   const { data: project } = await supabase
     .from('projects')
-    .select('*, crm_clients(name)')
+    .select('*, crm_leads(name)')
     .eq('id', params.id)
     .single()
     
@@ -33,7 +33,7 @@ export default async function ProjectTasksPage({ params }: { params: { id: strin
             <span className="text-slate-400 text-sm font-medium">Tasks</span>
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-white">{project.name}</h1>
-          <p className="text-slate-400">Client: {project.crm_clients?.name}</p>
+          <p className="text-slate-400">Client: {project.crm_leads?.name}</p>
         </div>
         <Button className="bg-blue-600 hover:bg-blue-700 text-white">
           <Plus className="mr-2 h-4 w-4" /> Add Task

@@ -9,7 +9,7 @@ export default async function CRMPage() {
   const supabase = createClient()
   
   const { data: clients } = await supabase
-    .from('crm_clients')
+    .from('crm_leads')
     .select('*')
     .order('created_at', { ascending: false })
 

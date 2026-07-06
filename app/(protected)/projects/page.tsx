@@ -10,7 +10,7 @@ export default async function ProjectsPage() {
   
   const { data: projects } = await supabase
     .from('projects')
-    .select('*, crm_clients(name)')
+    .select('*, crm_leads(name)')
     .order('created_at', { ascending: false })
 
   return (
@@ -48,7 +48,7 @@ export default async function ProjectsPage() {
               <div className="space-y-4">
                 <div className="flex justify-between text-sm text-slate-300">
                   <span className="text-slate-500">Client</span>
-                  <span className="font-medium">{project.crm_clients?.name}</span>
+                  <span className="font-medium">{project.crm_leads?.name}</span>
                 </div>
                 <div className="flex justify-between text-sm text-slate-300">
                   <span className="text-slate-500 flex items-center gap-1"><Clock className="h-3 w-3" /> Start</span>
