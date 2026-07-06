@@ -1,8 +1,30 @@
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
   try {
+    const supabase = createClient()
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+
+    if (userError || !user) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const { data: currentEmployee, error: verifyError } = await supabase
+      .from('employees')
+      .select('role')
+      .eq('user_id', user.id)
+      .single()
+
+    if (verifyError || !currentEmployee) {
+      return NextResponse.json({ success: false, error: 'Failed to verify authorization' }, { status: 403 })
+    }
+
+    if (currentEmployee.role !== 'super_admin' && currentEmployee.role !== 'hr') {
+      return NextResponse.json({ success: false, error: 'Insufficient permissions to create employees' }, { status: 403 })
+    }
+
     const { employee } = await req.json()
     const supabaseAdmin = createAdminClient()
 
