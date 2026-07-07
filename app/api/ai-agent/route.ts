@@ -9,6 +9,7 @@ export async function POST(req: Request) {
     
     // Auth Check
     const { data: { user } } = await supabase.auth.getUser()
+
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -35,7 +36,21 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ reply })
   } catch (error: unknown) {
-    console.error('AI Agent Error:', error)
+    interface GeminiError extends Error {
+      status?: number;
+      statusText?: string;
+      code?: string | number;
+      response?: {
+        status?: number;
+        statusText?: string;
+      };
+    }
+    const err = error as GeminiError;
+    console.error('Gemini Error');
+    console.error(`Model: ${process.env.GEMINI_MODEL || "gemini-2.5-flash"}`);
+    console.error(`Status: ${err?.status || err?.response?.status || err?.code || 'N/A'}`);
+    console.error(`Status Text: ${err?.statusText || err?.response?.statusText || 'N/A'}`);
+    console.error(`Message: ${err?.message || 'Unknown error'}`);
     return NextResponse.json({ error: 'Failed to process request' }, { status: 500 })
   }
 }

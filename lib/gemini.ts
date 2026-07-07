@@ -9,12 +9,13 @@ export async function askHRAgent(
     data?: unknown;
   }
 ) {
-  if (!process.env.GOOGLE_AI_API_KEY) {
-    throw new Error("GOOGLE_AI_API_KEY environment variable is missing.");
+  const apiKey = process.env.GOOGLE_AI_API_KEY;
+  if (!apiKey || apiKey.trim() === "") {
+    throw new Error("GOOGLE_AI_API_KEY environment variable is missing or empty.");
   }
-  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+  const genAI = new GoogleGenerativeAI(apiKey);
 
-  const modelName = process.env.GEMINI_MODEL || "gemini-1.5-pro";
+  const modelName = process.env.GEMINI_MODEL || "gemini-2.5-flash";
   const appName = process.env.NEXT_PUBLIC_APP_NAME || "Nexora HRMS";
   const companyName = process.env.NEXT_PUBLIC_COMPANY_NAME || "Nexora Solutions Pvt. Ltd.";
 
