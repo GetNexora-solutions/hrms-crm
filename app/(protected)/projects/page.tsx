@@ -1,17 +1,25 @@
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Plus, Clock, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
+import { ErrorState } from '@/components/shared/ErrorState'
+import { EmptyState } from '@/components/shared/EmptyState'
+import { StatusBadge } from '@/components/shared/StatusBadge'
 
 export default async function ProjectsPage() {
   const supabase = createClient()
   
-  const { data: projects } = await supabase
+  const { data: projects, error: projectsError } = await supabase
     .from('projects')
     .select('*, crm_leads(name)')
     .order('created_at', { ascending: false })
+
+  if (projectsError) {
+    return (
+      <ErrorState message={projectsError.message} />
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -30,13 +38,7 @@ export default async function ProjectsPage() {
           <Card key={project.id} className="bg-slate-900 border-slate-800 flex flex-col hover:border-slate-700 transition-colors">
             <CardHeader>
               <div className="flex justify-between items-start mb-2">
-                <Badge variant="outline" className={
-                  project.status === 'completed' ? 'text-green-500 border-green-500 bg-green-500/10' :
-                  project.status === 'in_progress' ? 'text-blue-500 border-blue-500 bg-blue-500/10' :
-                  'text-yellow-500 border-yellow-500 bg-yellow-500/10'
-                }>
-                  {project.status.replace('_', ' ')}
-                </Badge>
+                <StatusBadge status={project.status} />
                 <span className="text-xs text-slate-500 font-medium">ID: {project.id.substring(0,8)}</span>
               </div>
               <CardTitle className="text-white text-xl line-clamp-1">{project.name}</CardTitle>
@@ -71,8 +73,8 @@ export default async function ProjectsPage() {
           </Card>
         ))}
         {(!projects || projects.length === 0) && (
-          <div className="col-span-full text-center py-20 text-slate-400 border border-dashed border-slate-800 rounded-xl">
-            No projects found. Create one to get started.
+          <div className="col-span-full">
+            <EmptyState />
           </div>
         )}
       </div>

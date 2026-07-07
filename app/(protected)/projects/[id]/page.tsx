@@ -1,10 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Plus, CheckSquare, Clock } from 'lucide-react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { EmptyState } from '@/components/shared/EmptyState'
+import { StatusBadge } from '@/components/shared/StatusBadge'
 
 export default async function ProjectTasksPage({ params }: { params: { id: string } }) {
   const supabase = createClient()
@@ -55,13 +56,7 @@ export default async function ProjectTasksPage({ params }: { params: { id: strin
                   <p className="text-sm text-slate-400 mb-3">{task.description}</p>
                   
                   <div className="flex items-center gap-4 text-xs">
-                    <Badge variant="outline" className={
-                      task.status === 'done' ? 'text-green-400 border-green-500/30 bg-green-500/10' :
-                      task.status === 'in_progress' ? 'text-blue-400 border-blue-500/30 bg-blue-500/10' :
-                      'text-yellow-400 border-yellow-500/30 bg-yellow-500/10'
-                    }>
-                      {task.status.replace('_', ' ')}
-                    </Badge>
+                    <StatusBadge status={task.status} />
                     <span className="text-slate-500">Assignee: <span className="text-slate-300">{task.employees?.full_name || 'Unassigned'}</span></span>
                     {task.due_date && (
                       <span className="flex items-center gap-1 text-slate-500">
@@ -77,9 +72,7 @@ export default async function ProjectTasksPage({ params }: { params: { id: strin
             ))}
             
             {(!tasks || tasks.length === 0) && (
-              <div className="text-center py-12 text-slate-400">
-                No tasks found for this project.
-              </div>
+              <EmptyState />
             )}
           </div>
         </CardContent>

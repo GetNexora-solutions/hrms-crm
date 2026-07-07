@@ -58,22 +58,19 @@ export function Sidebar({ role }: SidebarProps) {
         <h1 className="text-xl font-bold text-white truncate text-ellipsis">ABC HRMS</h1>
       </div>
       <div className="flex-1 overflow-y-auto py-4">
-        <nav className="space-y-1 px-3">
+        <nav className="grid items-start px-4 text-sm font-medium space-y-1">
           {routes.map((route) => {
-            const isActive = pathname === route.href || pathname.startsWith(`${route.href}/`)
-            const Icon = route.icon
+            const isActive = pathname.startsWith(route.href)
             return (
               <Link
                 key={route.href}
                 href={route.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                  isActive 
-                    ? "bg-slate-800 text-blue-400" 
-                    : "hover:bg-slate-800 hover:text-white"
+                  "flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-white",
+                  isActive ? "bg-slate-800 text-white" : "text-slate-400 hover:bg-slate-800/50"
                 )}
               >
-                <Icon className="h-5 w-5 shrink-0" />
+                <route.icon className={cn("h-4 w-4", isActive ? "text-blue-500" : "")} />
                 {route.label}
               </Link>
             )

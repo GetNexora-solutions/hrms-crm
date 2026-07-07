@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { File, Download } from 'lucide-react'
 import { DocumentUpload } from './DocumentUpload'
+import { ErrorState } from '@/components/shared/ErrorState'
+import { EmptyState } from '@/components/shared/EmptyState'
 
 export default async function DocumentsPage() {
   const employee = await getCurrentEmployee()
@@ -20,7 +22,13 @@ export default async function DocumentsPage() {
     query = query.eq('employee_id', employee.id)
   }
 
-  const { data: documents } = await query
+  const { data: documents, error: docsError } = await query
+
+  if (docsError) {
+    return (
+      <ErrorState message={docsError.message} />
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -79,8 +87,8 @@ export default async function DocumentsPage() {
               ))}
               {(!documents || documents.length === 0) && (
                 <TableRow className="border-slate-800">
-                  <TableCell colSpan={employee.role !== 'employee' ? 5 : 4} className="text-center text-slate-400 h-24">
-                    No documents found.
+                  <TableCell colSpan={employee.role !== 'employee' ? 5 : 4} className="h-32 text-center">
+                    <EmptyState />
                   </TableCell>
                 </TableRow>
               )}

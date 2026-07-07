@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { toast } from 'sonner'
-import { Building2 } from 'lucide-react'
+import { Building2, Loader2 } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -21,7 +21,7 @@ export default function LoginPage() {
     setLoading(true)
     
     const { data, error } = await supabase.auth.signInWithPassword({
-      email,
+      email: email.trim(),
       password,
     })
 
@@ -102,7 +102,14 @@ export default function LoginPage() {
               className="w-full bg-blue-600 hover:bg-blue-700 text-white"
               disabled={loading}
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                "Sign In"
+              )}
             </Button>
           </form>
         </CardContent>

@@ -7,6 +7,9 @@ import { Plus, Edit, Eye } from 'lucide-react'
 import Link from 'next/link'
 import { getCurrentEmployee } from '@/lib/rbac'
 import { DeactivateButton } from './DeactivateButton'
+import { ErrorState } from '@/components/shared/ErrorState'
+import { EmptyState } from '@/components/shared/EmptyState'
+import { StatusBadge } from '@/components/shared/StatusBadge'
 
 export default async function EmployeesPage() {
   const supabase = createClient()
@@ -19,7 +22,9 @@ export default async function EmployeesPage() {
   const currentEmployee = await getCurrentEmployee()
 
   if (error) {
-    return <div>Error loading employees: {error.message}</div>
+    return (
+      <ErrorState message={error.message} />
+    )
   }
 
   return (
@@ -66,12 +71,7 @@ export default async function EmployeesPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge 
-                      variant={emp.status === 'active' ? 'default' : 'secondary'}
-                      className={emp.status === 'active' ? 'bg-green-500/10 text-green-500 hover:bg-green-500/20 border-green-500/20' : 'bg-slate-800 text-slate-300'}
-                    >
-                      {emp.status}
-                    </Badge>
+                    <StatusBadge status={emp.status} />
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
@@ -98,8 +98,8 @@ export default async function EmployeesPage() {
               ))}
               {employees?.length === 0 && (
                 <TableRow className="border-slate-800">
-                  <TableCell colSpan={6} className="text-center text-slate-400 h-24">
-                    No employees found.
+                  <TableCell colSpan={7} className="h-32 text-center">
+                    <EmptyState />
                   </TableCell>
                 </TableRow>
               )}

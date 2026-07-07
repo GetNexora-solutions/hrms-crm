@@ -38,7 +38,7 @@ export function DocumentUpload({ employeeId }: { employeeId: string }) {
       // 2. Save DB record
       const { error: dbError } = await supabase.from('documents').insert({
         employee_id: employeeId,
-        name,
+        name: name.trim(),
         type,
         file_url: fileName
       })
@@ -106,7 +106,7 @@ export function DocumentUpload({ employeeId }: { employeeId: string }) {
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={() => setOpen(false)} className="hover:bg-slate-800">
+            <Button type="button" variant="ghost" onClick={() => setOpen(false)} className="hover:bg-slate-800 hover:text-white">
               Cancel
             </Button>
             <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700">

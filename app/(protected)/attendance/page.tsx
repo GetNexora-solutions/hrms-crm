@@ -3,7 +3,9 @@ import { getCurrentEmployee } from '@/lib/rbac'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { AttendanceClient } from './AttendanceClient'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
+import { ErrorState } from '@/components/shared/ErrorState'
+import { EmptyState } from '@/components/shared/EmptyState'
+import { StatusBadge } from '@/components/shared/StatusBadge'
 
 export default async function AttendancePage() {
   const employee = await getCurrentEmployee()
@@ -22,12 +24,18 @@ export default async function AttendancePage() {
     .maybeSingle()
 
   // Get recent attendance history
-  const { data: history } = await supabase
+  const { data: history, error: historyError } = await supabase
     .from('attendance')
     .select('*')
     .eq('employee_id', employee.id)
     .order('date', { ascending: false })
     .limit(30)
+
+  if (historyError) {
+    return (
+      <ErrorState message={historyError.message} />
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -78,15 +86,17 @@ export default async function AttendancePage() {
                     {record.check_out ? new Date(record.check_out).toLocaleTimeString() : '--'}
                   </TableCell>
                   <TableCell>
-                    <Badge 
-                      variant={record.status === 'present' ? 'default' : 'secondary'}
-                      className={record.status === 'present' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-slate-800 text-slate-300'}
-                    >
-                      {record.status}
-                    </Badge>
+                    <StatusBadge status={record.status} />
                   </TableCell>
                 </TableRow>
               ))}
+              {(!history || history.length === 0) && (
+                <TableRow className="border-slate-800">
+                  <TableCell colSpan={4} className="h-32 text-center">
+                    <EmptyState />
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>

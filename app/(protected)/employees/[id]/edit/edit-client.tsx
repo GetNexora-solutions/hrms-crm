@@ -15,17 +15,17 @@ import { Loader2, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 
 const formSchema = z.object({
-  full_name: z.string().min(2, 'Full name must be at least 2 characters'),
-  phone: z.string().optional(),
-  department: z.string().min(2, 'Department must be at least 2 characters'),
-  designation: z.string().min(2, 'Designation must be at least 2 characters'),
-  role: z.string().min(1, 'Please select a role'),
-  salary: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
+  full_name: z.string().trim().min(2, 'Full name must be at least 2 characters'),
+  phone: z.string().trim().optional(),
+  department: z.string().trim().min(2, 'Department must be at least 2 characters'),
+  designation: z.string().trim().min(2, 'Designation must be at least 2 characters'),
+  role: z.string().trim().min(1, 'Please select a role'),
+  salary: z.string().trim().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, {
     message: 'Salary must be a positive number',
   }),
-  bank_name: z.string().optional(),
-  bank_account: z.string().optional(),
-  bank_ifsc: z.string().optional(),
+  bank_name: z.string().trim().optional(),
+  bank_account: z.string().trim().optional(),
+  bank_ifsc: z.string().trim().optional(),
 })
 
 type FormValues = z.infer<typeof formSchema>

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
+import { StatusBadge } from '@/components/shared/StatusBadge'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -121,12 +122,7 @@ export default async function EmployeeProfilePage({ params }: { params: { id: st
             <CardContent className="space-y-4">
                <div>
                   <p className="text-sm font-medium text-slate-400 mb-2">Status</p>
-                  <Badge 
-                    variant={targetEmployee.status === 'active' ? 'default' : 'secondary'}
-                    className={targetEmployee.status === 'active' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-slate-800 text-slate-300'}
-                  >
-                    {targetEmployee.status.toUpperCase()}
-                  </Badge>
+                  <StatusBadge status={targetEmployee.status} />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-slate-400 mb-2">System Role</p>

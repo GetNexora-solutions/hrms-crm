@@ -2,10 +2,12 @@ import { createClient } from '@/lib/supabase/server'
 import { getCurrentEmployee } from '@/lib/rbac'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { FileDown } from 'lucide-react'
 import { GeneratePayrollButton } from './GeneratePayrollButton'
+import { ErrorState } from '@/components/shared/ErrorState'
+import { EmptyState } from '@/components/shared/EmptyState'
+import { StatusBadge } from '@/components/shared/StatusBadge'
 
 export default async function PayrollPage() {
   const employee = await getCurrentEmployee()
@@ -20,7 +22,13 @@ export default async function PayrollPage() {
     query = query.eq('employee_id', employee.id)
   }
 
-  const { data: payrollRecords } = await query
+  const { data: payrollRecords, error: payrollError } = await query
+
+  if (payrollError) {
+    return (
+      <ErrorState message={payrollError.message} />
+    )
+  }
 
   const canGenerate = ['super_admin', 'hr', 'finance', 'admin'].includes(employee.role)
 
@@ -62,11 +70,7 @@ export default async function PayrollPage() {
                   <TableCell className="text-slate-300">₹{record.gross_salary}</TableCell>
                   <TableCell className="text-slate-300 font-bold">₹{record.net_salary}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={
-                      record.status === 'paid' ? 'text-green-500 border-green-500' : 'text-yellow-500 border-yellow-500'
-                    }>
-                      {record.status}
-                    </Badge>
+                    <StatusBadge status={record.status} />
                   </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20" asChild>
@@ -79,8 +83,8 @@ export default async function PayrollPage() {
               ))}
               {(!payrollRecords || payrollRecords.length === 0) && (
                 <TableRow className="border-slate-800">
-                  <TableCell colSpan={canGenerate ? 6 : 5} className="text-center text-slate-400 h-24">
-                    No payroll records found.
+                  <TableCell colSpan={canGenerate ? 6 : 5} className="h-32 text-center">
+                    <EmptyState />
                   </TableCell>
                 </TableRow>
               )}

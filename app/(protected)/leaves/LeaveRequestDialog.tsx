@@ -27,6 +27,7 @@ export function LeaveRequestDialog({ employeeId, leaveTypes }: { employeeId: str
     if (!start || !end) return 0
     const d1 = new Date(start)
     const d2 = new Date(end)
+    if (d2 < d1) return -1 // Invalid range
     const diffTime = Math.abs(d2.getTime() - d1.getTime())
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
   }
@@ -37,7 +38,7 @@ export function LeaveRequestDialog({ employeeId, leaveTypes }: { employeeId: str
 
     const days = calculateDays(formData.from_date, formData.to_date)
     if (days <= 0) {
-      toast.error("Invalid dates selected")
+      toast.error(days === -1 ? "To Date cannot be before From Date" : "Invalid dates selected")
       setLoading(false)
       return
     }
@@ -48,7 +49,7 @@ export function LeaveRequestDialog({ employeeId, leaveTypes }: { employeeId: str
       from_date: formData.from_date,
       to_date: formData.to_date,
       days,
-      reason: formData.reason,
+      reason: formData.reason.trim(),
       status: 'pending'
     })
 

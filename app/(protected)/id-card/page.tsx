@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { getCurrentEmployee } from '@/lib/rbac'
 import { IDCardView } from './IDCardView'
+import { ErrorState } from '@/components/shared/ErrorState'
 
 export default async function IDCardPage() {
   const employee = await getCurrentEmployee()
@@ -9,11 +10,17 @@ export default async function IDCardPage() {
   if (!employee) return null
 
   // Fetch full employee info with company details
-  const { data: empData } = await supabase
+  const { data: empData, error: idError } = await supabase
     .from('employees')
     .select('*, companies(*)')
     .eq('id', employee.id)
     .single()
+
+  if (idError) {
+    return (
+      <ErrorState message={idError.message} />
+    )
+  }
 
   return (
     <div className="space-y-6">

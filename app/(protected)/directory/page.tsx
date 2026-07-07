@@ -4,6 +4,8 @@ import { Input } from '@/components/ui/input'
 import { Search, Mail, Phone, Building2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
+import { ErrorState } from '@/components/shared/ErrorState'
+import { EmptyState } from '@/components/shared/EmptyState'
 
 export default async function DirectoryPage({ searchParams }: { searchParams: { q?: string } }) {
   const supabase = createClient()
@@ -14,7 +16,13 @@ export default async function DirectoryPage({ searchParams }: { searchParams: { 
     query = query.or(`full_name.ilike.%${searchParams.q}%,department.ilike.%${searchParams.q}%,designation.ilike.%${searchParams.q}%`)
   }
 
-  const { data: employees } = await query
+  const { data: employees, error: directoryError } = await query
+
+  if (directoryError) {
+    return (
+      <ErrorState message={directoryError.message} />
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -85,9 +93,9 @@ export default async function DirectoryPage({ searchParams }: { searchParams: { 
         ))}
       </div>
 
-      {employees?.length === 0 && (
-        <div className="text-center py-20 text-slate-400">
-          No employees found matching your search.
+      {(!employees || employees.length === 0) && (
+        <div className="col-span-full">
+          <EmptyState />
         </div>
       )}
     </div>

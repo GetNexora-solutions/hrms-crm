@@ -34,11 +34,23 @@ export function OnboardingForm({ companyId, hrId }: { companyId: string | null, 
     setLoading(true)
 
     try {
+      const trimmedFormData = {
+        ...formData,
+        full_name: formData.full_name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        department: formData.department.trim(),
+        designation: formData.designation.trim(),
+        bank_name: formData.bank_name.trim(),
+        bank_account: formData.bank_account.trim(),
+        bank_ifsc: formData.bank_ifsc.trim(),
+      }
+
       // Create user auth + employee record + send welcome
       const res = await fetch('/api/onboarding/welcome', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ employee: { ...formData, company_id: companyId }, hrId })
+        body: JSON.stringify({ employee: { ...trimmedFormData, company_id: companyId }, hrId })
       })
 
       const data = await res.json()

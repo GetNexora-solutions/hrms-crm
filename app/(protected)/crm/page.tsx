@@ -1,17 +1,25 @@
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Building, Phone, Mail } from 'lucide-react'
+import { ErrorState } from '@/components/shared/ErrorState'
+import { EmptyState } from '@/components/shared/EmptyState'
+import { StatusBadge } from '@/components/shared/StatusBadge'
 
 export default async function CRMPage() {
   const supabase = createClient()
   
-  const { data: clients } = await supabase
+  const { data: clients, error: crmError } = await supabase
     .from('crm_leads')
     .select('*')
     .order('created_at', { ascending: false })
+
+  if (crmError) {
+    return (
+      <ErrorState message={crmError.message} />
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -65,13 +73,7 @@ export default async function CRMPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={
-                      client.status === 'active' ? 'text-green-500 border-green-500' :
-                      client.status === 'lead' ? 'text-yellow-500 border-yellow-500' :
-                      'text-slate-500 border-slate-500'
-                    }>
-                      {client.status}
-                    </Badge>
+                    <StatusBadge status={client.status} />
                   </TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20">
@@ -82,8 +84,8 @@ export default async function CRMPage() {
               ))}
               {(!clients || clients.length === 0) && (
                 <TableRow className="border-slate-800">
-                  <TableCell colSpan={4} className="text-center text-slate-400 h-24">
-                    No clients found.
+                  <TableCell colSpan={4} className="h-32 text-center">
+                    <EmptyState />
                   </TableCell>
                 </TableRow>
               )}

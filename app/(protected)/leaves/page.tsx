@@ -2,9 +2,11 @@ import { createClient } from '@/lib/supabase/server'
 import { getCurrentEmployee } from '@/lib/rbac'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
 import { LeaveRequestDialog } from './LeaveRequestDialog'
 import { LeaveActions } from './LeaveActions'
+import { ErrorState } from '@/components/shared/ErrorState'
+import { EmptyState } from '@/components/shared/EmptyState'
+import { StatusBadge } from '@/components/shared/StatusBadge'
 
 export default async function LeavesPage() {
   const employee = await getCurrentEmployee()
@@ -16,11 +18,17 @@ export default async function LeavesPage() {
   const { data: leaveTypes } = await supabase.from('leave_types').select('*')
 
   // Fetch User's Leave Requests
-  const { data: myLeaves } = await supabase
+  const { data: myLeaves, error: leavesError } = await supabase
     .from('leave_requests')
     .select(`*, leave_types(name)`)
     .eq('employee_id', employee.id)
     .order('created_at', { ascending: false })
+
+  if (leavesError) {
+    return (
+      <ErrorState message={leavesError.message} />
+    )
+  }
 
   // If Admin/Manager, fetch pending leaves of others
   let pendingApprovals: { id: string; status: string; from_date: string; to_date: string; days: number; reason: string; created_at: string; employees: { full_name: string; emp_id: string } | null; leave_types: { name: string } | null }[] = []
@@ -67,23 +75,21 @@ export default async function LeavesPage() {
                   <TableCell className="text-slate-300">{new Date(leave.to_date).toLocaleDateString()}</TableCell>
                   <TableCell className="text-slate-300">{leave.days}</TableCell>
                   <TableCell>
-                    <Badge 
-                      variant="outline"
-                      className={
-                        leave.status === 'approved' ? 'bg-green-500/10 text-green-500 border-green-500/20' :
-                        leave.status === 'rejected' ? 'bg-red-500/10 text-red-500 border-red-500/20' :
-                        'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
-                      }
-                    >
-                      {leave.status}
-                    </Badge>
+                    <div className="flex flex-col items-start gap-1">
+                      <StatusBadge status={leave.status} />
+                      {leave.status === 'rejected' && leave.rejection_reason && (
+                        <span className="text-xs text-slate-500 max-w-[200px] truncate" title={leave.rejection_reason}>
+                          Reason: {leave.rejection_reason}
+                        </span>
+                      )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
               {(!myLeaves || myLeaves.length === 0) && (
                 <TableRow className="border-slate-800">
-                  <TableCell colSpan={5} className="text-center text-slate-400 h-24">
-                    No leave requests found.
+                  <TableCell colSpan={5} className="h-32 text-center">
+                    <EmptyState />
                   </TableCell>
                 </TableRow>
               )}
