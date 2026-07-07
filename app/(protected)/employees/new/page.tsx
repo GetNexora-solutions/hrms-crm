@@ -123,7 +123,7 @@ export default function AddEmployeePage() {
                   type="email"
                   {...register('email')}
                   className="bg-slate-950 border-slate-800 text-white"
-                  placeholder="john@example.com"
+                  placeholder="john@nexorasolutions.com"
                 />
                 {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
               </div>

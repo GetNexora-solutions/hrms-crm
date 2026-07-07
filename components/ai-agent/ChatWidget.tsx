@@ -31,6 +31,9 @@ export function ChatWidget({ employeeName, role }: ChatWidgetProps) {
     setLoading(true)
 
     try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000)
+
       const response = await fetch('/api/ai-agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -41,17 +44,29 @@ export function ChatWidget({ employeeName, role }: ChatWidgetProps) {
             name: employeeName,
             module: pathname
           }
-        })
+        }),
+        signal: controller.signal
       })
+      clearTimeout(timeoutId)
+
       const data = await response.json()
       
-      setChatHistory(prev => [...prev, { role: 'agent', text: data.reply || "I couldn't process that." }])
-    } catch {
-      setChatHistory(prev => [...prev, { role: 'agent', text: "Error connecting to AI assistant." }])
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to process request")
+      }
+
+      setChatHistory(prev => [...prev, { role: 'agent', text: data.reply || "Sorry, I am currently unavailable due to a server error." }])
+    } catch (err: unknown) {
+      const errorMessage = (err instanceof Error && err.name === 'AbortError')
+        ? "Nexora AI Assistant is taking longer than expected. Please try again." 
+        : "Sorry, I am currently unavailable due to a server error."
+      setChatHistory(prev => [...prev, { role: 'agent', text: errorMessage }])
     } finally {
       setLoading(false)
     }
   }
+
+  const assistantName = process.env.NEXT_PUBLIC_AI_ASSISTANT_NAME || "Nexora AI Assistant"
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
@@ -59,7 +74,7 @@ export function ChatWidget({ employeeName, role }: ChatWidgetProps) {
         <Card className="w-80 h-[450px] mb-4 shadow-2xl flex flex-col border-slate-700 bg-slate-900 overflow-hidden">
           <CardHeader className="p-3 border-b border-slate-800 flex flex-row items-center justify-between bg-slate-800">
             <CardTitle className="text-sm flex items-center gap-2 text-white">
-              <Bot className="h-4 w-4 text-blue-400" /> HR Assistant
+              <Bot className="h-4 w-4 text-blue-400" /> {assistantName}
             </CardTitle>
             <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="h-6 w-6 text-slate-400 hover:text-white">
               <X className="h-4 w-4" />

@@ -1,7 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!);
-
 export async function askHRAgent(
   userMessage: string,
   context: {
@@ -11,10 +9,17 @@ export async function askHRAgent(
     data?: unknown;
   }
 ) {
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+  if (!process.env.GOOGLE_AI_API_KEY) {
+    throw new Error("GOOGLE_AI_API_KEY environment variable is missing.");
+  }
+  const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+
+  const modelName = process.env.GEMINI_MODEL || "gemini-1.5-pro";
+  const appName = process.env.NEXT_PUBLIC_APP_NAME || "Nexora HRMS";
+  const companyName = process.env.NEXT_PUBLIC_COMPANY_NAME || "Nexora Solutions Pvt. Ltd.";
 
   const systemPrompt = `
-You are an intelligent HR assistant for ABC Company's HRMS platform.
+You are an intelligent HR assistant for ${companyName}'s ${appName} platform.
 Current user: ${context.name} (Role: ${context.role})
 Current module: ${context.module}
 
@@ -35,9 +40,12 @@ Never share data the user's role shouldn't access.
 Context data: ${JSON.stringify(context.data || {})}
   `;
 
-  const chat = model.startChat({
-    history: [{ role: "user", parts: [{ text: systemPrompt }] }],
+  const model = genAI.getGenerativeModel({ 
+    model: modelName,
+    systemInstruction: systemPrompt 
   });
+
+  const chat = model.startChat();
 
   const result = await chat.sendMessage(userMessage);
   return result.response.text();

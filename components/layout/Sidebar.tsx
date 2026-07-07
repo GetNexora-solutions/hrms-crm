@@ -55,7 +55,7 @@ export function Sidebar({ role }: SidebarProps) {
   return (
     <div className="flex h-full w-64 flex-col bg-slate-900 border-r border-slate-800 text-slate-300">
       <div className="flex h-16 shrink-0 items-center px-6">
-        <h1 className="text-xl font-bold text-white truncate text-ellipsis">ABC HRMS</h1>
+        <h1 className="text-xl font-bold text-white truncate text-ellipsis">Nexora HRMS</h1>
       </div>
       <div className="flex-1 overflow-y-auto py-4">
         <nav className="grid items-start px-4 text-sm font-medium space-y-1">

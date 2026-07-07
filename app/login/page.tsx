@@ -67,7 +67,7 @@ export default function LoginPage() {
           <div className="h-12 w-12 bg-blue-600 rounded-full flex items-center justify-center mb-2">
             <Building2 className="h-6 w-6 text-white" />
           </div>
-          <CardTitle className="text-2xl font-bold tracking-tight">ABC HRMS</CardTitle>
+          <CardTitle className="text-2xl font-bold tracking-tight">Nexora HRMS</CardTitle>
           <CardDescription className="text-slate-400">
             Enter your credentials to access your account
           </CardDescription>
@@ -79,7 +79,7 @@ export default function LoginPage() {
               <Input 
                 id="email" 
                 type="email" 
-                placeholder="m.scott@abccompany.com"
+                placeholder="m.scott@nexorasolutions.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -114,7 +114,7 @@ export default function LoginPage() {
           </form>
         </CardContent>
         <CardFooter className="flex justify-center text-sm text-slate-500">
-          © {new Date().getFullYear()} ABC Company Pvt. Ltd.
+          © {new Date().getFullYear()} Nexora Solutions Pvt. Ltd.
         </CardFooter>
       </Card>
     </div>

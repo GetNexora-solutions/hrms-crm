@@ -21,7 +21,7 @@ export const PayslipDocument = ({ payroll }: { payroll: { employees?: { full_nam
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.header}>
-        <Text style={styles.companyName}>{payroll.employees?.companies?.name || 'ABC Company Pvt. Ltd.'}</Text>
+        <Text style={styles.companyName}>{payroll.employees?.companies?.name || 'Nexora Solutions Pvt. Ltd.'}</Text>
         <Text style={styles.title}>Payslip for {payroll.month}</Text>
       </View>
 
