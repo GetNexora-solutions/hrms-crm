@@ -8,8 +8,8 @@ export async function GET(request: Request, { params }: { params: { id: string }
     const service = new RecruitmentService(supabase)
     const candidate = await service.getCandidateById(params.id)
     return NextResponse.json(candidate)
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error: unknown) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 })
   }
 }
 
@@ -20,8 +20,8 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     const body = await request.json()
     const candidate = await service.updateCandidate(params.id, body)
     return NextResponse.json(candidate)
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error: unknown) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 })
   }
 }
 
@@ -31,7 +31,7 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
     const service = new RecruitmentService(supabase)
     const candidate = await service.deleteCandidate(params.id)
     return NextResponse.json(candidate)
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error: unknown) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 })
   }
 }

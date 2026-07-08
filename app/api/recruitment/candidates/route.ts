@@ -18,8 +18,8 @@ export async function GET(request: Request) {
     const candidates = await service.getCandidates(filters)
 
     return NextResponse.json(candidates)
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error: unknown) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 })
   }
 }
 
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 
     const candidate = await service.createCandidate(body)
     return NextResponse.json(candidate, { status: 201 })
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error: unknown) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 })
   }
 }

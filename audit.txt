@@ -1,0 +1,39 @@
+
+Path                                                                                    LineNumber Line
+----                                                                                    ---------- ----
+C:\Users\user\.gemini\antigravity\scratch\hrms-crm\app\(protected)\admin\page.tsx                3 export default
+                                                                                                   function
+                                                                                                   PlaceholderPage() {
+C:\Users\user\.gemini\antigravity\scratch\hrms-crm\app\(protected)\assets\page.tsx               3 export default
+                                                                                                   function
+                                                                                                   PlaceholderPage() {
+C:\Users\user\.gemini\antigravity\scratch\hrms-crm\app\(protected)\expenses\page.tsx             3 export default
+                                                                                                   function
+                                                                                                   PlaceholderPage() {
+C:\Users\user\.gemini\antigravity\scratch\hrms-crm\app\(protected)\helpdesk\page.tsx             3 export default
+                                                                                                   function
+                                                                                                   PlaceholderPage() {
+C:\Users\user\.gemini\antigravity\scratch\hrms-crm\app\(protected)\recruitment\page.tsx          3 export default
+                                                                                                   function
+                                                                                                   PlaceholderPage() {
+C:\Users\user\.gemini\antigravity\scratch\hrms-crm\app\api\onboarding\welcome\route.ts         106     // 4. (Mock)
+                                                                                                   Send Welcome Email &
+                                                                                                   WhatsApp
+C:\Users\user\.gemini\antigravity\scratch\hrms-crm\app\api\onboarding\welcome\route.ts         107     const
+                                                                                                   mockEmailStatus =
+                                                                                                   `Sent to
+                                                                                                   ${employee.email}`
+C:\Users\user\.gemini\antigravity\scratch\hrms-crm\app\api\onboarding\welcome\route.ts         108     const
+                                                                                                   mockWhatsAppStatus =
+                                                                                                   `Sent to
+                                                                                                   ${employee.phone}`
+C:\Users\user\.gemini\antigravity\scratch\hrms-crm\app\api\onboarding\welcome\route.ts         114       email:
+                                                                                                   mockEmailStatus,
+C:\Users\user\.gemini\antigravity\scratch\hrms-crm\app\api\onboarding\welcome\route.ts         115       whatsapp:
+                                                                                                   mockWhatsAppStatus
+C:\Users\user\.gemini\antigravity\scratch\hrms-crm\lib\services\employee-id.ts                  17     throw new
+                                                                                                   Error('Employee ID
+                                                                                                   pattern must contain
+                                                                                                   {SERIAL}
+                                                                                                   placeholder.')
+

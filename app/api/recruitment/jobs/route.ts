@@ -19,8 +19,8 @@ export async function GET(request: Request) {
     const jobs = await service.getJobs(filters)
 
     return NextResponse.json(jobs)
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error: unknown) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 })
   }
 }
 
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
     const job = await service.createJob(body)
     return NextResponse.json(job, { status: 201 })
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  } catch (error: unknown) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 })
   }
 }

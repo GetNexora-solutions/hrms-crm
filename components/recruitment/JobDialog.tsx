@@ -39,8 +39,8 @@ export function JobDialog() {
       toast.success('Job created successfully')
       setOpen(false)
       router.refresh()
-    } catch (err: any) {
-      toast.error(err.message)
+    } catch (err: unknown) {
+      toast.error((err as Error).message)
     } finally {
       setLoading(false)
     }

@@ -37,8 +37,8 @@ export function CandidateDialog() {
       toast.success('Candidate created successfully')
       setOpen(false)
       router.refresh()
-    } catch (err: any) {
-      toast.error(err.message)
+    } catch (err: unknown) {
+      toast.error((err as Error).message)
     } finally {
       setLoading(false)
     }

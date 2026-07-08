@@ -38,7 +38,7 @@ export class RecruitmentService {
   // --------------------------------------------------------
   // JOB POSTINGS
   // --------------------------------------------------------
-  async getJobs(filters: any = {}) {
+  async getJobs(filters: Record<string, unknown> = {}) {
     let query = this.supabase.from('job_postings').select('*')
 
     if (filters.status) query = query.eq('status', filters.status)
@@ -64,7 +64,7 @@ export class RecruitmentService {
     return data
   }
 
-  async createJob(payload: any) {
+  async createJob(payload: Record<string, unknown>) {
     const { data, error } = await this.supabase
       .from('job_postings')
       .insert(payload)
@@ -74,7 +74,7 @@ export class RecruitmentService {
     return data
   }
 
-  async updateJob(id: string, payload: any) {
+  async updateJob(id: string, payload: Record<string, unknown>) {
     const { data, error } = await this.supabase
       .from('job_postings')
       .update(payload)
@@ -93,7 +93,7 @@ export class RecruitmentService {
   // --------------------------------------------------------
   // CANDIDATES
   // --------------------------------------------------------
-  async getCandidates(filters: any = {}) {
+  async getCandidates(filters: Record<string, unknown> = {}) {
     let query = this.supabase.from('candidates').select('*')
 
     if (filters.current_stage) query = query.eq('current_stage', filters.current_stage)
@@ -121,7 +121,7 @@ export class RecruitmentService {
     return data
   }
 
-  async createCandidate(payload: any) {
+  async createCandidate(payload: Record<string, unknown>) {
     const { data, error } = await this.supabase
       .from('candidates')
       .insert(payload)
@@ -146,7 +146,7 @@ export class RecruitmentService {
     return data
   }
 
-  async updateCandidate(id: string, payload: any) {
+  async updateCandidate(id: string, payload: Record<string, unknown>) {
     // Get existing to check if stage changed
     const existing = await this.getCandidateById(id)
     
@@ -194,7 +194,7 @@ export class RecruitmentService {
   // --------------------------------------------------------
   // INTERVIEWS
   // --------------------------------------------------------
-  async getInterviews(filters: any = {}) {
+  async getInterviews(filters: Record<string, unknown> = {}) {
     let query = this.supabase.from('interviews').select('*, candidates(name, current_stage), job_postings(title)')
 
     if (filters.candidate_id) query = query.eq('candidate_id', filters.candidate_id)
@@ -218,7 +218,7 @@ export class RecruitmentService {
     return data
   }
 
-  async createInterview(payload: any) {
+  async createInterview(payload: Record<string, unknown>) {
     const { data, error } = await this.supabase
       .from('interviews')
       .insert(payload)
@@ -241,7 +241,7 @@ export class RecruitmentService {
     return data
   }
 
-  async updateInterview(id: string, payload: any) {
+  async updateInterview(id: string, payload: Record<string, unknown>) {
     const { data, error } = await this.supabase
       .from('interviews')
       .update(payload)
@@ -271,7 +271,7 @@ export class RecruitmentService {
   // --------------------------------------------------------
   // DOCUMENTS
   // --------------------------------------------------------
-  async createDocument(payload: any) {
+  async createDocument(payload: Record<string, unknown>) {
     const { data, error } = await this.supabase
       .from('candidate_documents')
       .insert(payload)
@@ -290,6 +290,25 @@ export class RecruitmentService {
       console.error("Timeline insert failed", err)
     }
     
+    return data
+  }
+  async getCandidateTimeline(candidateId: string) {
+    const { data, error } = await this.supabase
+      .from('candidate_timeline')
+      .select('*, performed_by_employee:employees!candidate_timeline_performed_by_fkey(full_name)')
+      .eq('candidate_id', candidateId)
+      .order('created_at', { ascending: false })
+    if (error) throw error
+    return data
+  }
+
+  async getCandidateDocuments(candidateId: string) {
+    const { data, error } = await this.supabase
+      .from('candidate_documents')
+      .select('*')
+      .eq('candidate_id', candidateId)
+      .order('created_at', { ascending: false })
+    if (error) throw error
     return data
   }
 }
