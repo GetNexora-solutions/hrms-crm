@@ -121,6 +121,34 @@ export class RecruitmentService {
     return data
   }
 
+  // --------------------------------------------------------
+  // DUPLICATE DETECTION
+  // --------------------------------------------------------
+  async checkDuplicate(email: string, phone: string): Promise<Record<string, unknown>[]> {
+    if (!email && !phone) return []
+
+    let query = this.supabase
+      .from('candidates')
+      .select('id, name, email, phone, current_stage, created_at')
+
+    if (email && phone) {
+      query = query.or(`email.ilike.%${email}%,phone.ilike.%${phone}%`)
+    } else if (email) {
+      query = query.ilike('email', `%${email}%`)
+    } else if (phone) {
+      query = query.ilike('phone', `%${phone}%`)
+    }
+
+    const { data, error } = await query.limit(5)
+    
+    if (error) {
+      console.error("Error checking for duplicate candidates:", error)
+      throw error
+    }
+
+    return data || []
+  }
+
   async createCandidate(payload: Record<string, unknown>) {
     const { data, error } = await this.supabase
       .from('candidates')

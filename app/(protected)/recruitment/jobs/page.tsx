@@ -4,6 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { JobDialog } from '@/components/recruitment/JobDialog'
+import { JobApprovalActions } from '@/components/recruitment/JobApprovalActions'
 
 export default async function JobsPage() {
   const supabase = createClient()
@@ -31,7 +32,9 @@ export default async function JobsPage() {
                 <TableHead className="text-slate-400">Department</TableHead>
                 <TableHead className="text-slate-400">Type</TableHead>
                 <TableHead className="text-slate-400">Status</TableHead>
+                <TableHead className="text-slate-400">Approval</TableHead>
                 <TableHead className="text-slate-400 text-right">Filled</TableHead>
+                <TableHead className="text-slate-400 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -45,7 +48,19 @@ export default async function JobsPage() {
                       {job.status}
                     </Badge>
                   </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={
+                      job.approval_status === 'Approved' ? 'text-green-400 border-green-400' : 
+                      job.approval_status === 'Rejected' ? 'text-red-400 border-red-400' : 
+                      'text-yellow-400 border-yellow-400'
+                    }>
+                      {job.approval_status || 'Approved'}
+                    </Badge>
+                  </TableCell>
                   <TableCell className="text-right text-slate-300">{job.filled_positions} / {job.vacancies || 0}</TableCell>
+                  <TableCell className="text-right">
+                    <JobApprovalActions jobId={job.id} currentStatus={job.approval_status || 'Approved'} />
+                  </TableCell>
                 </TableRow>
               ))}
               {(!jobs || jobs.length === 0) && (

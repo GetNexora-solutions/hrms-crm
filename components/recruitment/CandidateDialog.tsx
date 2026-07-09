@@ -1,18 +1,53 @@
 "use client"
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Plus } from 'lucide-react'
+import { Plus, AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 export function CandidateDialog() {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [duplicates, setDuplicates] = useState<{ id: string, name: string, email: string, current_stage: string }[]>([])
+  const [checkingDupes, setCheckingDupes] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    const checkDupes = async () => {
+      if (!email && !phone) {
+        setDuplicates([]);
+        return;
+      }
+      setCheckingDupes(true);
+      try {
+        const res = await fetch('/api/recruitment/candidates/duplicate-check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, phone })
+        });
+        const data = await res.json();
+        if (data.isDuplicate) {
+          setDuplicates(data.duplicates);
+        } else {
+          setDuplicates([]);
+        }
+      } catch (err) {
+        console.error("Duplicate check failed", err);
+      } finally {
+        setCheckingDupes(false);
+      }
+    };
+
+    const timer = setTimeout(checkDupes, 500);
+    return () => clearTimeout(timer);
+  }, [email, phone]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -36,6 +71,9 @@ export function CandidateDialog() {
       
       toast.success('Candidate created successfully')
       setOpen(false)
+      setEmail('')
+      setPhone('')
+      setDuplicates([])
       router.refresh()
     } catch (err: unknown) {
       toast.error((err as Error).message)
@@ -45,7 +83,14 @@ export function CandidateDialog() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(val) => {
+      setOpen(val)
+      if (!val) {
+        setEmail('')
+        setPhone('')
+        setDuplicates([])
+      }
+    }}>
       <DialogTrigger asChild>
         <Button className="bg-blue-600 hover:bg-blue-700 text-white">
           <Plus className="mr-2 h-4 w-4" /> Add Candidate
@@ -64,11 +109,28 @@ export function CandidateDialog() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
-              <Input id="email" name="email" type="email" required className="bg-slate-800 border-slate-700" placeholder="john@example.com" />
+              <Input 
+                id="email" 
+                name="email" 
+                type="email" 
+                required 
+                className="bg-slate-800 border-slate-700" 
+                placeholder="john@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Phone <span className="text-red-500">*</span></Label>
-              <Input id="phone" name="phone" required className="bg-slate-800 border-slate-700" placeholder="+1234567890" />
+              <Input 
+                id="phone" 
+                name="phone" 
+                required 
+                className="bg-slate-800 border-slate-700" 
+                placeholder="+1234567890"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+              />
             </div>
           </div>
 
@@ -91,11 +153,26 @@ export function CandidateDialog() {
             </Select>
           </div>
 
+          {duplicates.length > 0 && (
+            <Alert variant="destructive" className="bg-red-950 border-red-900 text-red-200">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Possible Duplicate Found</AlertTitle>
+              <AlertDescription>
+                {duplicates.length} candidate(s) exist with similar contact info.
+                <ul className="mt-2 list-disc list-inside text-xs">
+                  {duplicates.map(d => (
+                    <li key={d.id}>{d.name} ({d.email}) - {d.current_stage}</li>
+                  ))}
+                </ul>
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="pt-4 flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => setOpen(false)} className="border-slate-700 hover:bg-slate-800">
               Cancel
             </Button>
-            <Button type="submit" disabled={loading} className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Button type="submit" disabled={loading || checkingDupes} className="bg-blue-600 hover:bg-blue-700 text-white">
               {loading ? 'Adding...' : 'Add Candidate'}
             </Button>
           </div>
