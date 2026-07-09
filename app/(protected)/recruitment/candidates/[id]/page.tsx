@@ -5,6 +5,7 @@ import { RecruitmentService } from '@/lib/services/recruitment'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { format } from 'date-fns'
 import { DocumentDialog } from '@/components/recruitment/DocumentDialog'
+import { CandidateActions } from '@/components/recruitment/CandidateActions'
 
 export default async function CandidateDetailPage({ params }: { params: { id: string } }) {
   const supabase = createClient()
@@ -19,14 +20,22 @@ export default async function CandidateDetailPage({ params }: { params: { id: st
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-white">{candidate.name}</h1>
           <p className="text-slate-400">{candidate.email} | {candidate.phone}</p>
         </div>
-        <Badge variant="outline" className="text-purple-400 border-purple-400 text-lg py-1 px-4">
-          {candidate.current_stage || 'Applied'}
-        </Badge>
+        <div className="flex items-center gap-4">
+          <Badge variant="outline" className="text-purple-400 border-purple-400 text-lg py-1 px-4">
+            {candidate.current_stage || 'Applied'}
+          </Badge>
+          <CandidateActions 
+            candidateId={candidate.id} 
+            candidateName={candidate.full_name}
+            jobId={candidate.job_id}
+            jobTitle={((candidate.job_postings as unknown) as { title: string })?.title || 'Unknown Job'}
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
