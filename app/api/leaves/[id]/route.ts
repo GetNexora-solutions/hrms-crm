@@ -1,29 +1,17 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { getCurrentEmployee, hasPermission } from '@/lib/rbac'
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
   try {
     const supabase = createClient()
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    const currentEmployee = await getCurrentEmployee()
 
-    if (userError || !user) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+    if (!currentEmployee) {
+      return NextResponse.json({ success: false, error: 'Unauthorized or invalid employee' }, { status: 401 })
     }
 
-    // 1. Get current user's employee record to verify role
-    const { data: currentEmployee, error: verifyError } = await supabase
-      .from('employees')
-      .select('id, role, company_id')
-      .eq('user_id', user.id)
-      .single()
-
-    if (verifyError || !currentEmployee) {
-      return NextResponse.json({ success: false, error: 'Failed to verify authorization' }, { status: 403 })
-    }
-
-    // Must be an admin role to approve/reject
-    const adminRoles = ['super_admin', 'hr', 'md', 'admin']
-    if (!adminRoles.includes(currentEmployee.role)) {
+    if (!hasPermission(currentEmployee.role, ['super_admin', 'hr', 'md', 'admin'])) {
       return NextResponse.json({ success: false, error: 'Insufficient permissions' }, { status: 403 })
     }
 

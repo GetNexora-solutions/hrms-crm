@@ -1,11 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { getCurrentEmployee, hasPermission } from '@/lib/rbac'
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
     const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const currentEmployee = await getCurrentEmployee()
+    if (!currentEmployee) return NextResponse.json({ error: 'Unauthorized or invalid employee' }, { status: 401 })
 
     // Fetch doc info
     const { data: document } = await supabase
@@ -17,10 +18,9 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     if (!document) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
     // Check permissions
-    const { data: currentUser } = await supabase.from('employees').select('role, id').eq('user_id', user.id).single()
-    const isAdmin = ['super_admin', 'hr', 'md', 'admin'].includes(currentUser?.role || '')
+    const isAdmin = hasPermission(currentEmployee.role, ['super_admin', 'hr', 'md', 'admin'])
     
-    if (!isAdmin && document.employee_id !== currentUser?.id) {
+    if (!isAdmin && document.employee_id !== currentEmployee.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 

@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { RecruitmentService } from "@/lib/services/recruitment";
+import { getCurrentEmployee } from '@/lib/rbac'
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const currentEmployee = await getCurrentEmployee()
 
-    // Authenticated users only for internal duplicate checking
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Authenticated active employees only for internal duplicate checking
+    if (!currentEmployee) {
+      return NextResponse.json({ error: "Unauthorized or invalid employee" }, { status: 401 });
     }
+    const supabase = createClient();
 
     const { email, phone } = await req.json();
 

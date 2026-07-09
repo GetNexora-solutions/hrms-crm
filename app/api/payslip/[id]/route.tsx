@@ -2,14 +2,15 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { renderToStream } from '@react-pdf/renderer'
 import { PayslipDocument } from '@/components/pdf/PayslipDocument'
+import { getCurrentEmployee, hasPermission } from '@/lib/rbac'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
     const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const currentEmployee = await getCurrentEmployee()
+    if (!currentEmployee) return NextResponse.json({ error: 'Unauthorized or invalid employee' }, { status: 401 })
 
     // Fetch payroll record
     const { data: payroll } = await supabase
@@ -21,12 +22,9 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     if (!payroll) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
     // Role check (must be admin/hr/finance OR the employee themselves)
-    const { data: currentUser } = await supabase.from('employees').select('role, id').eq('user_id', user.id).single()
+    const isAdmin = hasPermission(currentEmployee.role, ['super_admin', 'hr', 'finance', 'md', 'admin'])
     
-    if (
-      !['super_admin', 'hr', 'finance', 'md', 'admin'].includes(currentUser?.role || '') &&
-      currentUser?.id !== payroll.employee_id
-    ) {
+    if (!isAdmin && currentEmployee.id !== payroll.employee_id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 

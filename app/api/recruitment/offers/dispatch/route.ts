@@ -3,15 +3,20 @@ import { createClient } from "@/lib/supabase/server";
 import { emailService } from "@/lib/services/email";
 import { pdfService } from "@/lib/services/pdf";
 import { tokenService } from "@/lib/services/token";
+import { getCurrentEmployee, hasPermission } from '@/lib/rbac'
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const currentEmployee = await getCurrentEmployee()
 
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!currentEmployee) {
+      return NextResponse.json({ error: 'Unauthorized or invalid employee' }, { status: 401 })
     }
+
+    if (!hasPermission(currentEmployee.role, ['super_admin', 'hr', 'md', 'admin', 'manager', 'recruiter'])) {
+      return NextResponse.json({ error: 'Insufficient permissions to dispatch offers' }, { status: 403 })
+    }
+    const supabase = createClient();
 
     const body = await req.json();
     const { candidateId, ctc, designation, doj } = body;
@@ -103,7 +108,7 @@ export async function POST(req: NextRequest) {
       stage: 'Offer Released',
       action: 'Offer Letter Emailed',
       notes: `Sent offer for ${designation} at CTC ${ctc}. Token generated.`,
-      performed_by: user.id
+      performed_by: currentEmployee.id
     });
 
     // 7. Update Candidate Stage

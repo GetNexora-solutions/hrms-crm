@@ -1,8 +1,8 @@
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { EmployeeIdConfig, resolvePatternPrefixes, generateEmployeeId } from '@/lib/services/employee-id'
 import { getNextEmployeeSerial } from '@/lib/services/employee-serial'
+import { getCurrentEmployee, hasPermission } from '@/lib/rbac'
 
 // Temporary config for Phase B
 const TEMP_ID_CONFIG: EmployeeIdConfig = {
@@ -14,24 +14,13 @@ const TEMP_ID_CONFIG: EmployeeIdConfig = {
 
 export async function POST(req: Request) {
   try {
-    const supabase = createClient()
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    const currentEmployee = await getCurrentEmployee()
 
-    if (userError || !user) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+    if (!currentEmployee) {
+      return NextResponse.json({ success: false, error: 'Unauthorized or invalid employee' }, { status: 401 })
     }
 
-    const { data: currentEmployee, error: verifyError } = await supabase
-      .from('employees')
-      .select('role, company_id')
-      .eq('user_id', user.id)
-      .single()
-
-    if (verifyError || !currentEmployee) {
-      return NextResponse.json({ success: false, error: 'Failed to verify authorization' }, { status: 403 })
-    }
-
-    if (currentEmployee.role !== 'super_admin' && currentEmployee.role !== 'hr') {
+    if (!hasPermission(currentEmployee.role, ['super_admin', 'hr', 'md', 'admin'])) {
       return NextResponse.json({ success: false, error: 'Insufficient permissions to create employees' }, { status: 403 })
     }
 

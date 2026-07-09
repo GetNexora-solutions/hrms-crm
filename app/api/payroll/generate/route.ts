@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { calculatePayroll } from '@/lib/payroll'
 import { NextResponse } from 'next/server'
+import { getCurrentEmployee, hasPermission } from '@/lib/rbac'
 
 export async function POST(req: Request) {
   try {
@@ -8,12 +9,11 @@ export async function POST(req: Request) {
     const supabase = createClient()
     
     // Auth Check
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const currentEmployee = await getCurrentEmployee()
+    if (!currentEmployee) return NextResponse.json({ error: 'Unauthorized or invalid employee' }, { status: 401 })
     
     // Role check (must be admin/hr/finance)
-    const { data: admin } = await supabase.from('employees').select('role').eq('user_id', user.id).single()
-    if (!['super_admin', 'hr', 'finance', 'md', 'admin'].includes(admin?.role)) {
+    if (!hasPermission(currentEmployee.role, ['super_admin', 'hr', 'finance', 'md', 'admin'])) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 

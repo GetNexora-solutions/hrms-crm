@@ -1,6 +1,7 @@
 import { askHRAgent } from '@/lib/gemini'
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { getCurrentEmployee } from '@/lib/rbac'
 
 export async function POST(req: Request) {
   try {
@@ -8,21 +9,10 @@ export async function POST(req: Request) {
     const supabase = createClient()
     
     // Auth Check
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Get Employee Data
-    const { data: employee } = await supabase
-      .from('employees')
-      .select('id, role')
-      .eq('user_id', user.id)
-      .single()
+    const employee = await getCurrentEmployee()
 
     if (!employee) {
-      return NextResponse.json({ error: 'Employee not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Unauthorized or invalid employee' }, { status: 401 })
     }
 
     // Pass data into Gemini

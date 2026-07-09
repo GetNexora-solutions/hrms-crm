@@ -1,35 +1,24 @@
-import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import { getCurrentEmployee, hasPermission } from '@/lib/rbac'
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   try {
-    const supabase = createClient()
-    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    const currentEmployee = await getCurrentEmployee()
 
-    if (userError || !user) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+    if (!currentEmployee) {
+      return NextResponse.json({ success: false, error: 'Unauthorized or invalid employee' }, { status: 401 })
     }
 
-    const { data: currentEmployee, error: verifyError } = await supabase
-      .from('employees')
-      .select('role, company_id')
-      .eq('user_id', user.id)
-      .single()
-
-    if (verifyError || !currentEmployee) {
-      return NextResponse.json({ success: false, error: 'Failed to verify authorization' }, { status: 403 })
-    }
-
-    if (currentEmployee.role !== 'super_admin' && currentEmployee.role !== 'hr') {
+    if (!hasPermission(currentEmployee.role, ['super_admin', 'hr', 'md', 'admin'])) {
       return NextResponse.json({ success: false, error: 'Insufficient permissions to update employees' }, { status: 403 })
     }
 
     const { employee } = await req.json()
-    const supabaseAdmin = createAdminClient()
+    const supabase = createClient()
 
     // 1. Verify target employee belongs to the same company
-    const { data: targetEmployee, error: targetError } = await supabaseAdmin
+    const { data: targetEmployee, error: targetError } = await supabase
       .from('employees')
       .select('company_id')
       .eq('id', params.id)
@@ -64,7 +53,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     }
 
     // 3. Update Employee Record
-    const { data: empData, error: empError } = await supabaseAdmin
+    const { data: empData, error: empError } = await supabase
       .from('employees')
       .update(updateData)
       .eq('id', params.id)

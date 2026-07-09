@@ -1,14 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
 import { employeeProvisioningService } from "@/lib/services/employee-provisioning-instance";
+import { getCurrentEmployee, hasPermission } from '@/lib/rbac'
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const supabase = createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const currentEmployee = await getCurrentEmployee()
 
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!currentEmployee) {
+      return NextResponse.json({ error: 'Unauthorized or invalid employee' }, { status: 401 })
+    }
+
+    if (!hasPermission(currentEmployee.role, ['super_admin', 'hr', 'md', 'admin', 'manager', 'recruiter'])) {
+      return NextResponse.json({ error: 'Insufficient permissions to convert candidates' }, { status: 403 })
     }
 
     const candidateId = params.id;
@@ -16,7 +19,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       return NextResponse.json({ error: "Candidate ID is required" }, { status: 400 });
     }
 
-    const { employeeId } = await employeeProvisioningService.convertCandidateToEmployee(candidateId, user.id);
+    const { employeeId } = await employeeProvisioningService.convertCandidateToEmployee(candidateId, currentEmployee.user_id);
 
     return NextResponse.json({ success: true, employeeId, message: "Candidate converted successfully" });
   } catch (error: unknown) {
