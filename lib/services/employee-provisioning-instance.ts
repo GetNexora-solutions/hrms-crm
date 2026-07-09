@@ -1,4 +1,7 @@
 import { createAdminClient } from './../supabase/admin';
-import { EmployeeProvisioningService } from './employee-provisioning';
+import { EmployeeProvisioningService, DefaultEmployeeIdGenerator } from './employee-provisioning';
 
-export const employeeProvisioningService = new EmployeeProvisioningService(createAdminClient());
+const adminClient = createAdminClient();
+const defaultGenerator = new DefaultEmployeeIdGenerator(adminClient);
+
+export const employeeProvisioningService = new EmployeeProvisioningService(adminClient, defaultGenerator);

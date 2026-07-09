@@ -1,22 +1,20 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { emailService } from './email';
 
-export class EmployeeProvisioningService {
+export interface IEmployeeIdGenerator {
+  generate(companyId?: string): Promise<string>;
+}
+
+export class DefaultEmployeeIdGenerator implements IEmployeeIdGenerator {
   constructor(private supabaseAdmin: SupabaseClient) {}
 
-  /**
-   * Generates a new Employee ID (e.g., EMP001, EMP002).
-   * Note: In a heavily concurrent environment, this might need a sequence or transaction,
-   * but for this scope, a simple max check suffices.
-   */
-  private async generateNextEmployeeId(companyId?: string): Promise<string> {
+  async generate(companyId?: string): Promise<string> {
     const query = this.supabaseAdmin
       .from('employees')
       .select('emp_id')
       .order('emp_id', { ascending: false })
       .limit(1);
     
-    // If we have multi-tenant, we should scope by companyId, but let's just get the global max or scoped max.
     if (companyId) {
       query.eq('company_id', companyId);
     }
@@ -35,9 +33,15 @@ export class EmployeeProvisioningService {
       return `EMP${nextNum.toString().padStart(3, '0')}`;
     }
 
-    // Fallback if formatting is weird
     return `EMP${Date.now().toString().slice(-4)}`;
   }
+}
+
+export class EmployeeProvisioningService {
+  constructor(
+    private supabaseAdmin: SupabaseClient,
+    private idGenerator: IEmployeeIdGenerator
+  ) {}
 
   /**
    * Converts a candidate to an employee.
@@ -86,7 +90,7 @@ export class EmployeeProvisioningService {
 
     try {
       // 3. Generate Employee ID
-      const empId = await this.generateNextEmployeeId(candidate.job_postings?.company_id);
+      const empId = await this.idGenerator.generate(candidate.job_postings?.company_id);
 
       // 4. Create Employee Record
       const { data: employee, error: employeeError } = await this.supabaseAdmin
