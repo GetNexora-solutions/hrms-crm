@@ -38,18 +38,40 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    console.log("Job Creation API - Received Payload:", body)
 
     if (!body.title) {
       return NextResponse.json({ error: 'title is required' }, { status: 400 })
     }
 
-    // Sanitize payload to match the database schema (001_initial_schema.sql)
+    const parseNumber = (val: unknown) => val && !isNaN(Number(val)) ? Number(val) : null;
+    const parseArray = (val: unknown) => typeof val === 'string' ? val.split(',').map((s: string) => s.trim()).filter(Boolean) : (Array.isArray(val) ? val : null);
+    const parseUUID = (val: unknown) => (typeof val === 'string' && val.trim() !== '') ? val.trim() : null;
+
     const jobPayload: Record<string, unknown> = {
+      company_id: currentEmployee.company_id,
+      posted_by: currentEmployee.id,
       title: body.title,
       department: body.department,
-      status: body.status || 'open',
-      posted_by: currentEmployee.id
+      positions: parseNumber(body.positions) || 1,
+      status: body.status || 'Open',
+      description: body.description,
+      employment_type: body.employment_type || null,
+      hiring_priority: body.hiring_priority || null,
+      location_type: body.location_type || null,
+      hiring_type: body.hiring_type || null,
+      office_location: body.office_location || null,
+      reporting_manager_id: parseUUID(body.reporting_manager_id),
+      recruiter_id: parseUUID(body.recruiter_id),
+      hiring_manager: parseUUID(body.hiring_manager),
+      min_experience: parseNumber(body.min_experience),
+      max_experience: parseNumber(body.max_experience),
+      min_salary: parseNumber(body.min_salary),
+      max_salary: parseNumber(body.max_salary),
+      required_skills: parseArray(body.required_skills),
+      education_required: body.education_required || null,
+      joining_date: body.joining_date || null,
+      closing_date: body.closing_date || null,
+      approval_status: body.approval_status || 'Pending',
     }
 
     try {
