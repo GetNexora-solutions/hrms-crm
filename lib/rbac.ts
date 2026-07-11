@@ -13,9 +13,9 @@ export async function getCurrentEmployee() {
   return employee
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function hasPermission(_employeeRole: string, _allowedRoles: Role[]) {
-  return true;
+export function hasPermission(employeeRole: string | undefined, allowedRoles: string[]) {
+  if (!employeeRole) return false;
+  return allowedRoles.includes(employeeRole);
 }
 
 export const ROLES = {

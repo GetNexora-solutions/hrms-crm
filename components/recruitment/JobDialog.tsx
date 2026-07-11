@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, ChevronRight, ChevronLeft, Save } from 'lucide-react'
 import { toast } from 'sonner'
 
-type EmployeeOption = { id: string, full_name: string, employee_id: string };
+type EmployeeOption = { id: string, full_name: string, emp_id: string };
 export function JobDialog({ employees = [] }: { employees?: EmployeeOption[] }) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -186,7 +186,7 @@ export function JobDialog({ employees = [] }: { employees?: EmployeeOption[] }) 
                     <SelectContent>
                       {employees.map(emp => (
                         <SelectItem key={emp.id} value={emp.id}>
-                          {emp.full_name} ({emp.employee_id})
+                          {emp.full_name} ({emp.emp_id})
                         </SelectItem>
                       ))}
                     </SelectContent>

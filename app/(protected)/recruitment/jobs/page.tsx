@@ -6,10 +6,15 @@ import { EmptyState } from '@/components/shared/EmptyState'
 import { JobDialog } from '@/components/recruitment/JobDialog'
 import { JobApprovalActions } from '@/components/recruitment/JobApprovalActions'
 
+import { getCurrentEmployee, hasPermission, ROLES } from '@/lib/rbac'
+
 export default async function JobsPage() {
   const supabase = createClient()
+  const employee = await getCurrentEmployee()
+  const canCreateJob = employee ? hasPermission(employee.role, [ROLES.SUPER_ADMIN, ROLES.HR, ROLES.MD, ROLES.ADMIN, ROLES.RECRUITER, ROLES.MANAGER]) : false
+
   const { data: jobs } = await supabase.from('job_postings').select('*').order('created_at', { ascending: false })
-  const { data: employees } = await supabase.from('employees').select('id, full_name, employee_id').order('full_name')
+  const { data: employees } = await supabase.from('employees').select('id, full_name, emp_id').order('full_name')
 
   return (
     <div className="space-y-6">
@@ -18,7 +23,7 @@ export default async function JobsPage() {
           <h1 className="text-3xl font-bold tracking-tight text-white">Job Postings</h1>
           <p className="text-slate-400">Manage recruitment job listings.</p>
         </div>
-        <JobDialog employees={employees || []} />
+        {canCreateJob && <JobDialog employees={employees || []} />}
       </div>
 
       <Card className="bg-slate-900 border-slate-800">
