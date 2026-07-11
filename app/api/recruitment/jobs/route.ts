@@ -62,7 +62,6 @@ export async function POST(request: Request) {
       office_location: body.office_location || null,
       reporting_manager_id: parseUUID(body.reporting_manager_id),
       recruiter_id: parseUUID(body.recruiter_id),
-      hiring_manager: parseUUID(body.hiring_manager),
       min_experience: parseNumber(body.min_experience),
       max_experience: parseNumber(body.max_experience),
       min_salary: parseNumber(body.min_salary),

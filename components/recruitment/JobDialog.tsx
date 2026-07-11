@@ -9,7 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, ChevronRight, ChevronLeft, Save } from 'lucide-react'
 import { toast } from 'sonner'
 
-export function JobDialog() {
+type EmployeeOption = { id: string, full_name: string, employee_id: string };
+export function JobDialog({ employees = [] }: { employees?: EmployeeOption[] }) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1)
@@ -91,7 +92,10 @@ export function JobDialog() {
         body: JSON.stringify(draftData)
       })
 
-      if (!res.ok) throw new Error('Failed to save draft')
+      if (!res.ok) {
+        const errData = await res.json()
+        throw new Error(errData.error || 'Failed to save draft')
+      }
       
       toast.success('Draft saved successfully')
       setOpen(false)
@@ -174,8 +178,19 @@ export function JobDialog() {
                   <Input id="positions" type="number" min="1" value={formData.positions} onChange={e => handleChange('positions', parseInt(e.target.value))} className="bg-slate-800 border-slate-700" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="reporting_manager_id">Hiring Manager (ID)</Label>
-                  <Input id="reporting_manager_id" value={formData.reporting_manager_id} onChange={e => handleChange('reporting_manager_id', e.target.value)} className="bg-slate-800 border-slate-700" placeholder="Employee UUID" />
+                  <Label htmlFor="reporting_manager_id">Hiring Manager</Label>
+                  <Select value={formData.reporting_manager_id} onValueChange={v => handleChange('reporting_manager_id', v)}>
+                    <SelectTrigger className="bg-slate-800 border-slate-700">
+                      <SelectValue placeholder="Select Manager" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {employees.map(emp => (
+                        <SelectItem key={emp.id} value={emp.id}>
+                          {emp.full_name} ({emp.employee_id})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>
@@ -330,10 +345,9 @@ export function JobDialog() {
               
               <div className="space-y-2 pt-2">
                 <Label>Attachments</Label>
-                <div className="border-2 border-dashed border-slate-700 rounded-lg p-6 flex flex-col items-center justify-center text-slate-400 bg-slate-800/50">
-                  <p className="text-sm">Drag and drop JD PDF or other documents here</p>
-                  <p className="text-xs mt-1">(File upload functionality enabled in future phase)</p>
-                  <Button type="button" variant="outline" className="mt-4 bg-slate-800 border-slate-700">Browse Files</Button>
+                <div className="border-2 border-dashed border-slate-700 rounded-lg p-6 flex flex-col items-center justify-center text-slate-400 bg-slate-800/50 opacity-50 cursor-not-allowed">
+                  <p className="text-sm">Document upload will be available in Phase D1.1</p>
+                  <Button type="button" variant="outline" className="mt-4 bg-slate-800 border-slate-700" disabled>Browse Files</Button>
                 </div>
               </div>
             </div>

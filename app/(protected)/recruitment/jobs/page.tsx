@@ -9,6 +9,7 @@ import { JobApprovalActions } from '@/components/recruitment/JobApprovalActions'
 export default async function JobsPage() {
   const supabase = createClient()
   const { data: jobs } = await supabase.from('job_postings').select('*').order('created_at', { ascending: false })
+  const { data: employees } = await supabase.from('employees').select('id, full_name, employee_id').order('full_name')
 
   return (
     <div className="space-y-6">
@@ -17,7 +18,7 @@ export default async function JobsPage() {
           <h1 className="text-3xl font-bold tracking-tight text-white">Job Postings</h1>
           <p className="text-slate-400">Manage recruitment job listings.</p>
         </div>
-        <JobDialog />
+        <JobDialog employees={employees || []} />
       </div>
 
       <Card className="bg-slate-900 border-slate-800">

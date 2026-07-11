@@ -27,9 +27,6 @@ export async function PUT(request: Request, { params }: { params: { id: string }
     if (body.recruiter_id !== undefined) {
       body.recruiter_id = parseUUID(body.recruiter_id);
     }
-    if (body.hiring_manager !== undefined) {
-      body.hiring_manager = parseUUID(body.hiring_manager);
-    }
 
     const job = await service.updateJob(params.id, body)
     return NextResponse.json(job)
