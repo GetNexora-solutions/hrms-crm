@@ -17,6 +17,13 @@ export function JobViewDialog({ job, employees, children }: { job: Record<string
     return new Date(dateStr).toLocaleDateString()
   }
 
+  const getSkillsArray = (skills: unknown): string[] => {
+    if (!skills) return [];
+    if (Array.isArray(skills)) return skills as string[];
+    if (typeof skills === 'string' && skills.trim() !== '') return skills.split(',');
+    return [];
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -75,9 +82,11 @@ export function JobViewDialog({ job, employees, children }: { job: Record<string
           <div>
             <span className="text-slate-400 text-sm block mb-1">Skills Required</span>
             <div className="flex flex-wrap gap-2 mt-1">
-              {job.required_skills ? job.required_skills.split(',').map((s: string, i: number) => (
-                <Badge key={i} variant="secondary" className="bg-slate-800 text-slate-300 border-slate-700">{s.trim()}</Badge>
-              )) : '-'}
+              {getSkillsArray(job.required_skills).length > 0 
+                ? getSkillsArray(job.required_skills).map((s: string, i: number) => (
+                    <Badge key={i} variant="secondary" className="bg-slate-800 text-slate-300 border-slate-700">{s.trim()}</Badge>
+                  )) 
+                : '-'}
             </div>
           </div>
 
