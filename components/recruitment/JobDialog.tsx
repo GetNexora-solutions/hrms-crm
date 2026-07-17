@@ -10,7 +10,7 @@ import { Plus, ChevronRight, ChevronLeft, Save } from 'lucide-react'
 import { toast } from 'sonner'
 
 type EmployeeOption = { id: string, full_name: string, emp_id: string };
-export function JobDialog({ employees = [] }: { employees?: EmployeeOption[] }) {
+export function JobDialog({ employees = [], job, children }: { employees?: EmployeeOption[], job?: Record<string, unknown> & { id?: string; title?: string; department?: string; reporting_manager_id?: string; positions?: number; employment_type?: string; office_location?: string; location_type?: string; description?: string; required_skills?: string; preferred_skills?: string; min_experience?: string; max_experience?: string; education_required?: string; joining_date?: string; hiring_priority?: string; hiring_type?: string; salary_type?: string; min_salary?: string; max_salary?: string; salary_negotiable?: boolean; closing_date?: string; status?: string; approval_status?: string }, children?: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [step, setStep] = useState(1)
@@ -18,29 +18,29 @@ export function JobDialog({ employees = [] }: { employees?: EmployeeOption[] }) 
   
   // Basic Form State to simulate auto-save
   const [formData, setFormData] = useState({
-    title: '',
-    department: '',
-    reporting_manager_id: '',
-    positions: 1,
-    employment_type: 'Full-time',
-    office_location: '',
-    location_type: 'Remote',
-    description: '',
-    required_skills: '',
-    preferred_skills: '',
-    min_experience: '',
-    max_experience: '',
-    education_required: '',
-    joining_date: '',
-    hiring_priority: 'Medium',
-    hiring_type: 'New',
-    salary_type: 'Monthly',
-    min_salary: '',
-    max_salary: '',
-    salary_negotiable: false,
-    closing_date: '',
-    status: 'Open',
-    approval_status: 'Pending'
+    title: job?.title || '',
+    department: job?.department || '',
+    reporting_manager_id: job?.reporting_manager_id || '',
+    positions: job?.positions || 1,
+    employment_type: job?.employment_type || 'Full-time',
+    office_location: job?.office_location || '',
+    location_type: job?.location_type || 'Remote',
+    description: job?.description || '',
+    required_skills: job?.required_skills || '',
+    preferred_skills: job?.preferred_skills || '',
+    min_experience: job?.min_experience || '',
+    max_experience: job?.max_experience || '',
+    education_required: job?.education_required || '',
+    joining_date: job?.joining_date || '',
+    hiring_priority: job?.hiring_priority || 'Medium',
+    hiring_type: job?.hiring_type || 'New',
+    salary_type: job?.salary_type || 'Monthly',
+    min_salary: job?.min_salary || '',
+    max_salary: job?.max_salary || '',
+    salary_negotiable: job?.salary_negotiable || false,
+    closing_date: job?.closing_date || '',
+    status: job?.status || 'Open',
+    approval_status: job?.approval_status || 'Pending'
   })
 
   const handleChange = (field: string, value: string | number | boolean) => {
@@ -56,18 +56,22 @@ export function JobDialog({ employees = [] }: { employees?: EmployeeOption[] }) 
     
     setLoading(true)
     try {
-      const res = await fetch('/api/recruitment/jobs', {
-        method: 'POST',
+      const isEditing = !!job?.id;
+      const url = isEditing ? `/api/recruitment/jobs/${job.id}` : '/api/recruitment/jobs';
+      const method = isEditing ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
 
       if (!res.ok) {
         const data = await res.json()
-        throw new Error(data.error || 'Failed to create job')
+        throw new Error(data.error || `Failed to ${isEditing ? 'update' : 'create'} job`)
       }
       
-      toast.success('Job Requisition created successfully')
+      toast.success(isEditing ? 'Job Requisition updated successfully' : 'Job Requisition created successfully')
       setOpen(false)
       setStep(1)
       router.refresh()
@@ -86,8 +90,12 @@ export function JobDialog({ employees = [] }: { employees?: EmployeeOption[] }) 
     setLoading(true)
     try {
       const draftData = { ...formData, status: 'Draft' }
-      const res = await fetch('/api/recruitment/jobs', {
-        method: 'POST',
+      const isEditing = !!job?.id;
+      const url = isEditing ? `/api/recruitment/jobs/${job.id}` : '/api/recruitment/jobs';
+      const method = isEditing ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(draftData)
       })
@@ -110,13 +118,15 @@ export function JobDialog({ employees = [] }: { employees?: EmployeeOption[] }) 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-          <Plus className="mr-2 h-4 w-4" /> Add Job
-        </Button>
+        {children || (
+          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Plus className="mr-2 h-4 w-4" /> Add Job
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="bg-slate-900 border-slate-800 text-white sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader className="flex flex-row justify-between items-center">
-          <DialogTitle className="text-xl font-bold">Create Job Requisition</DialogTitle>
+          <DialogTitle className="text-xl font-bold">{job?.id ? 'Edit Job Requisition' : 'Create Job Requisition'}</DialogTitle>
           <div className="flex space-x-2 text-sm text-slate-400 font-medium">
             <span className={step >= 1 ? 'text-blue-500' : ''}>1. Basic</span> &gt;
             <span className={step >= 2 ? 'text-blue-500' : ''}>2. Details</span> &gt;

@@ -65,7 +65,7 @@ export default async function JobsPage() {
                   </TableCell>
                   <TableCell className="text-right text-slate-300">{job.filled_positions} / {job.vacancies || 0}</TableCell>
                   <TableCell className="text-right">
-                    <JobApprovalActions jobId={job.id} currentStatus={job.approval_status || 'Approved'} />
+                    <JobApprovalActions job={job} employees={employees || []} userRole={employee?.role} employeeId={employee?.id} />
                   </TableCell>
                 </TableRow>
               ))}

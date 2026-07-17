@@ -24,10 +24,11 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  let body: Record<string, unknown> = {}
   try {
     const supabase = createClient()
     const service = new RecruitmentService(supabase)
-    const body = await request.json()
+    body = await request.json()
 
     // Required fields validation
     if (!body.name || !body.email || !body.phone) {
@@ -37,6 +38,14 @@ export async function POST(request: Request) {
     const candidate = await service.createCandidate(body)
     return NextResponse.json(candidate, { status: 201 })
   } catch (error: unknown) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 })
+    const err = error as { message: string, code?: string, details?: string, hint?: string, stack?: string };
+    return NextResponse.json({ 
+      error: err.message,
+      code: err.code,
+      details: err.details,
+      hint: err.hint,
+      stack: err.stack,
+      payload: body
+    }, { status: 500 })
   }
 }

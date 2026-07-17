@@ -86,7 +86,14 @@ export async function POST(request: Request) {
     }
 
   } catch (error: unknown) {
-    console.error("Job Creation API - General Error:", error)
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 })
+    const err = error as { message: string; code?: string; details?: string; hint?: string; stack?: string };
+    console.error(err)
+    return NextResponse.json({
+      code: err.code || null,
+      message: err.message || String(err),
+      details: err.details || null,
+      hint: err.hint || null,
+      stack: err.stack || null
+    }, { status: 500 })
   }
 }
